@@ -20,7 +20,9 @@ You can also download binaries from [GitHub Releases](https://github.com/pylon-l
 
 ## Authenticate
 
-Create an API token in Pylon's API token settings. Run `pylon auth login` to save it, or provide it through the `PYLON_TOKEN` environment variable. Requests use the token owner's Pylon permissions. Use `--base-url https://api.eu.usepylon.com` for an EU organization.
+Create an API token in Pylon's API token settings. Run `pylon auth login --with-token` to save it with hidden terminal input, or provide it through the `PYLON_TOKEN` process environment variable. Requests use the token owner's Pylon permissions. Use `--base-url https://api.eu.usepylon.com` for an EU organization.
+
+macOS and Windows use their native credential stores when available. Linux static builds use a plaintext file in the user's config directory, restricted to the owner on Unix. If no private config directory is available, use `PYLON_TOKEN`; the CLI does not read credentials from a shared temporary directory. Repository `.env` files are not loaded automatically.
 
 ## Use
 
@@ -33,6 +35,8 @@ pylon issues bulk-update --help
 ```
 
 Commands use kebab-case, including `bulk-update` and `create-ai-response`. Each command supports `--schema` for machine-readable input documentation, `--dry-run` to inspect its request without sending it, and `--query` for JMESPath output projection. `pylon generate-skills` generates instructions for coding agents.
+
+JSON request bodies and object/array flags preserve strings literally, including text starting with `@`. Local file uploads require explicit file/upload parameters; customer text cannot select a local file merely by appearing in JSON. Table output strips terminal control characters, while JSON output preserves the original values with JSON escaping.
 
 ### Pagination and output
 
@@ -51,7 +55,7 @@ REST exposes fewer search options than the Pylon MCP server. CLI commands reflec
 
 The Pylon monorepo owns generation config, distribution config, tests, and this README under `fern/`. Its SDK sync workflow opens `sync/latest` PRs here. Edit generator-owned files in the monorepo so changes survive the next sync. This repository owns its `.github/` workflows, which the generation script backs up and restores. Workflow changes need a maintainer's GitHub credentials; the sync app has no workflow-write permission.
 
-Run `cargo build --locked`, `cargo test --locked --lib`, and `python3 tests/smoke.py` to check a generated CLI. Smoke checks use a local mock API and a fake token.
+Run `cargo build --locked`, `cargo test --locked --lib`, `python3 tests/smoke.py`, and `python3 tests/security.py` to check a generated CLI. Integration checks use a local mock API and fake tokens.
 
 After merging a sync PR, update the Cargo package version and lockfile, commit them, and push a matching `v`-prefixed tag (for example, `v0.1.0`). The release workflow builds platform archives and shell/PowerShell installers, then publishes a GitHub Release. Merging a PR alone does not publish a release. Homebrew and npm are not configured. macOS builds do not use an Apple signing certificate; release archives have GitHub provenance attestations.
 

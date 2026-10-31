@@ -328,8 +328,6 @@ pub(crate) fn run_token_paste_for(
         drop(err);
         multi_field_keyring_value(&read_fields_from_stdin(scheme_name, &fields)?)?
     } else {
-        let _ = writeln!(err, "Paste your token (input will be read from stdin):");
-        let _ = err.flush();
         drop(err);
         read_token_from_stdin()?
     };
@@ -358,6 +356,8 @@ pub(crate) fn run_token_paste_for(
 /// Read a single line from stdin, trimmed. Returns `Auth("No token …")`
 /// if empty / EOF.
 pub(crate) fn read_token_from_stdin() -> Result<String, CliError> {
+    let _hidden = crate::pylon_security::SecretInputGuard::new()?;
+    eprintln!("Paste your token (terminal input hidden):");
     read_line_from_stdin("token")
 }
 

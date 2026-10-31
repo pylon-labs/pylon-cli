@@ -3210,12 +3210,8 @@ pub(crate) fn collect_params_from_flags(
                         continue;
                     }
                     match serde_json::from_str::<serde_json::Value>(v) {
-                        Ok(serde_json::Value::Array(mut elems)) => {
-                            if json_items {
-                                for elem in &mut elems {
-                                    executor::resolve_file_refs(elem)?;
-                                }
-                            }
+                        Ok(serde_json::Value::Array(elems)) => {
+                            // Nested JSON strings are literal API data.
                             arr.extend(elems)
                         }
                         // A non-string element type means each occurrence is
@@ -3224,8 +3220,8 @@ pub(crate) fn collect_params_from_flags(
                         // string made an array-of-objects flag impossible to
                         // use one element at a time, while `--schema` now
                         // advertises `items: {type: object}`.
-                        Ok(mut decoded) if json_items => {
-                            executor::resolve_file_refs(&mut decoded)?;
+                        Ok(decoded) if json_items => {
+                            // Preserve JSON strings verbatim.
                             arr.push(decoded)
                         }
                         // Not JSON at all, on a list of single-field objects:
@@ -3295,12 +3291,12 @@ pub(crate) fn collect_params_from_flags(
                     // `Value::Array` rather than a verbatim string. Falls back
                     // to the raw string when the value isn't valid JSON.
                     match serde_json::from_str::<serde_json::Value>(value.as_str()) {
-                        Ok(mut parsed) => {
+                        Ok(parsed) => {
                             // Resolve `@filename` references inside nested
                             // string values — mirrors Stainless's CLI shorthand
                             // semantics (e.g. `--profile '{"pic":"@abe.jpg"}'`).
                             // FER-10436.
-                            executor::resolve_file_refs(&mut parsed)?;
+                            // Preserve JSON strings verbatim.
                             parsed
                         }
                         Err(_) => match &param_def.shorthand_field {
@@ -3513,8 +3509,8 @@ fn prompted_value_to_json(
     }
     if matches!(def.param_type.as_deref(), Some("object") | Some("array")) {
         return Ok(match serde_json::from_str::<serde_json::Value>(answer) {
-            Ok(mut parsed) => {
-                executor::resolve_file_refs(&mut parsed)?;
+            Ok(parsed) => {
+                // Preserve guided JSON strings verbatim.
                 parsed
             }
             Err(_) => match &def.shorthand_field {
@@ -5258,7 +5254,7 @@ mod tests {
     }
 
     #[test]
-    fn test_collect_params_repeated_object_resolves_file_refs() {
+    fn test_collect_params_repeated_object_preserves_file_like_strings() {
         let tmp = tempfile::NamedTempFile::new().unwrap();
         std::fs::write(tmp.path(), b"hello").unwrap();
         let path = tmp.path().to_str().unwrap();
@@ -5270,14 +5266,14 @@ mod tests {
         assert_eq!(
             result.get("attachments"),
             Some(&serde_json::json!([
-                {"content": "aGVsbG8=", "filename": "a.txt"},
-                {"content": "hello", "filename": "b.txt"},
+                {"content": format!("@data://{path}"), "filename": "a.txt"},
+                {"content": format!("@{path}"), "filename": "b.txt"},
             ])),
         );
     }
 
     #[test]
-    fn test_collect_params_repeated_object_json_array_resolves_file_refs() {
+    fn test_collect_params_repeated_object_json_array_is_literal() {
         let tmp = tempfile::NamedTempFile::new().unwrap();
         std::fs::write(tmp.path(), b"hello").unwrap();
         let path = tmp.path().to_str().unwrap();
@@ -5287,7 +5283,7 @@ mod tests {
         let result = collect_params_from_flags(&matches, &method, None).unwrap();
         assert_eq!(
             result.get("content"),
-            Some(&serde_json::json!([{"type": "text/plain", "value": "hello"}])),
+            Some(&serde_json::json!([{"type": "text/plain", "value": format!("@{path}")}])),
         );
     }
 
@@ -5298,9 +5294,8 @@ mod tests {
             "attachments",
             &[r#"{"content":"@data:///nonexistent/fern-cli-test.txt","filename":"a"}"#],
         );
-        let err = collect_params_from_flags(&matches, &method, None).unwrap_err();
-        let msg = err.to_string();
-        assert!(msg.contains("/nonexistent/fern-cli-test.txt"), "{msg}");
+        let result = collect_params_from_flags(&matches, &method, None).unwrap();
+        assert_eq!(result["attachments"][0]["content"], "@data:///nonexistent/fern-cli-test.txt");
     }
 
     #[test]

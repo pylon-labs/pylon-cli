@@ -202,7 +202,11 @@ impl OutputPipeline {
             None => value,
         };
         let rendered = self.render(effective, paginated, is_first_page);
-        writeln!(out, "{rendered}")?;
+        if self.format == OutputFormat::Table {
+            writeln!(out, "{}", crate::output::sanitize_for_terminal(&rendered))?;
+        } else {
+            writeln!(out, "{rendered}")?;
+        }
         Ok(())
     }
 
@@ -232,7 +236,11 @@ impl OutputPipeline {
             OutputFormat::Table => format_record_table(effective),
             _ => format_value(effective, &self.format),
         };
-        writeln!(out, "{rendered}")?;
+        if self.format == OutputFormat::Table {
+            writeln!(out, "{}", crate::output::sanitize_for_terminal(&rendered))?;
+        } else {
+            writeln!(out, "{rendered}")?;
+        }
         Ok(())
     }
 
@@ -251,7 +259,11 @@ impl OutputPipeline {
             return Ok(());
         }
         let rendered = self.render(value, paginated, is_first_page);
-        writeln!(out, "{rendered}")?;
+        if self.format == OutputFormat::Table {
+            writeln!(out, "{}", crate::output::sanitize_for_terminal(&rendered))?;
+        } else {
+            writeln!(out, "{rendered}")?;
+        }
         Ok(())
     }
 
