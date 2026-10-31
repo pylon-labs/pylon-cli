@@ -6,6 +6,7 @@
 
 // Public API — building blocks
 pub mod app;
+mod pylon_security;
 pub mod arg_source;
 pub mod asyncapi;
 pub mod auth;

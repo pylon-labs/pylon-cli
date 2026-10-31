@@ -690,7 +690,8 @@ impl CliApp {
         // Collect now, report after `init_logging` — a warning emitted before the
         // subscriber exists is dropped, which would leave a user whose `.env`
         // setting was ignored with no explanation at all.
-        let ignored_dotenv_keys = crate::load_dotenv_filtered(&self.name);
+        // Repository .env files must not configure credentials or child processes.
+        let ignored_dotenv_keys = Vec::<String>::new();
         crate::init_logging(&self.name);
         crate::warn_ignored_dotenv_keys(&ignored_dotenv_keys);
 

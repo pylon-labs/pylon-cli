@@ -807,7 +807,7 @@ pub fn auto_store() -> Arc<dyn KeyringStore> {
         tracing::debug!("FERN_CLI_CREDENTIAL_STORE=file; using file backend for credential storage");
         return match FileKeyringStore::user_default() {
             Some(store) => Arc::new(store),
-            None => Arc::new(FileKeyringStore::at_root(PathBuf::from("/tmp/fern-cli-credentials"))),
+            None => Arc::new(crate::pylon_security::UnavailableCredentialStore),
         };
     }
     #[cfg(not(target_env = "musl"))]
@@ -823,8 +823,8 @@ pub fn auto_store() -> Arc<dyn KeyringStore> {
     match FileKeyringStore::user_default() {
         Some(store) => Arc::new(store),
         None => {
-            tracing::warn!("No config dir available; using /tmp for credential storage");
-            Arc::new(FileKeyringStore::at_root(PathBuf::from("/tmp/fern-cli-credentials")))
+            tracing::warn!("No private config directory; stored credentials unavailable");
+            Arc::new(crate::pylon_security::UnavailableCredentialStore)
         }
     }
 }

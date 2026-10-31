@@ -154,6 +154,7 @@ pub(crate) fn encode_file_bytes_for_text(
 ///
 /// Errors include the file path and a JSON-Pointer-style path to the offending
 /// field for debuggability (e.g. `"/foo/bar/0/baz"`). FER-10436, FER-10532.
+#[cfg(test)]
 pub(crate) fn resolve_file_refs(value: &mut Value) -> Result<(), CliError> {
     resolve_file_refs_at_path(value, &mut String::new())
 }
@@ -162,6 +163,7 @@ pub(crate) fn resolve_file_refs(value: &mut Value) -> Result<(), CliError> {
 /// JSON-Pointer-style path (per RFC 6901, e.g. `""`, `"/foo"`, `"/foo/bar/0"`)
 /// to the value being inspected — extended in place as we descend and
 /// truncated on the way back up to avoid per-level allocations.
+#[cfg(test)]
 fn resolve_file_refs_at_path(value: &mut Value, pointer: &mut String) -> Result<(), CliError> {
     match value {
         Value::String(s) => {
@@ -922,7 +924,7 @@ fn parse_and_validate_inputs(
     // `body_from_flags` are never both populated (before global-param
     // injection), so the body is sourced from exactly one channel here.
     let body: Option<Value> = if let Some(b) = body_json {
-        let mut json_val: Value = serde_json::from_str(b)
+        let json_val: Value = serde_json::from_str(b)
             .map_err(|e| CliError::Validation(format!("Invalid --json body: {e}")))?;
         // Resolve `@file` references inside `--json` bodies, matching the
         // behavior of per-field object-shorthand flags (FER-10436).
@@ -936,7 +938,7 @@ fn parse_and_validate_inputs(
         // `block_in_place → block_on → block_in_place` chain in path (b).
         // The file reads are brief, and for a CLI tool the momentary
         // blocking of a single worker thread is acceptable.
-        resolve_file_refs(&mut json_val)?;
+        // JSON is literal API data; file reads require explicit upload parameters.
         Some(json_val)
     } else if !body_from_flags.is_empty() {
         Some(Value::Object(body_from_flags))
