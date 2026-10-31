@@ -652,9 +652,9 @@ mod tests {
     fn generates_shared_and_group_files() {
         let doc = minimal_doc();
         let files = generate_skills(&doc, "testcli", &bindings_for("TEST_API_KEY"), crate::auth::AuthStrategy::default());
-        let names: Vec<String> = files.iter().map(|(p, _)| p.display().to_string()).collect();
-        assert!(names.contains(&"testcli-shared/SKILL.md".to_string()));
-        assert!(names.contains(&"testcli-items/SKILL.md".to_string()));
+        let names: Vec<std::path::PathBuf> = files.iter().map(|(p, _)| p.clone()).collect();
+        assert!(names.contains(&std::path::Path::new("testcli-shared").join("SKILL.md")));
+        assert!(names.contains(&std::path::Path::new("testcli-items").join("SKILL.md")));
         assert_eq!(files.len(), 2);
     }
 

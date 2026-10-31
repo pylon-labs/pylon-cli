@@ -4,6 +4,14 @@ on:
   pull_request:
   push:
     branches: [main]
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+        required: false
+        default: ''
+  schedule:
+    - cron: '23 9 * * 1'
 
 permissions:
   contents: read
@@ -19,6 +27,7 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
+          ref: ${{ inputs.ref || github.ref }}
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
@@ -31,3 +40,34 @@ jobs:
         run: python tests/smoke.py
       - name: Test credential and untrusted-input boundaries
         run: python tests/security.py
+
+  audit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          ref: ${{ inputs.ref || github.ref }}
+      - name: Install pinned RustSec audit tool
+        run: cargo install cargo-audit --version 0.22.2 --locked
+      - name: Audit dependencies without advisory exceptions
+        run: cargo audit --deny warnings
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.13'
+      - name: Verify release source and authorization policy
+        run: python tests/release_source.py
+
+  release-ready:
+    name: release-ready
+    if: always()
+    needs: [test, audit]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Require tests and dependency audit
+        env:
+          TEST_RESULT: ${{ needs.test.result }}
+          AUDIT_RESULT: ${{ needs.audit.result }}
+        run: |
+          test "$TEST_RESULT" = success
+          test "$AUDIT_RESULT" = success
