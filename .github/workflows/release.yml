@@ -143,16 +143,35 @@ jobs:
           echo 'ARTIFACT_PATHS<<EOF' >> "$GITHUB_ENV"
           jq --raw-output '.upload_files[]' dist-manifest.json >> "$GITHUB_ENV"
           echo 'EOF' >> "$GITHUB_ENV"
+          cp dist-manifest.json target/distrib/dist-manifest.json
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: artifacts-build-global
           path: |
             ${{ env.ARTIFACT_PATHS }}
-            dist-manifest.json
+            target/distrib/dist-manifest.json
+
+  verify-distribution:
+    name: verify-distribution
+    if: ${{ !cancelled() && needs.source.result == 'success' && needs.plan.result == 'success' && needs.build-global-artifacts.result == 'success' }}
+    needs: [source, plan, build-global-artifacts]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          ref: ${{ needs.source.outputs.sha }}
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          pattern: artifacts-*
+          path: artifacts
+          merge-multiple: true
+      - name: Verify the assembled publication bundle
+        run: bash .github/scripts/verify-artifacts.sh artifacts
 
   attest:
     if: github.event_name == 'workflow_dispatch'
-    needs: [source, checks, plan, build-global-artifacts]
+    needs: [source, checks, plan, build-global-artifacts, verify-distribution]
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -170,7 +189,7 @@ jobs:
 
   publish:
     if: github.event_name == 'workflow_dispatch'
-    needs: [source, checks, plan, build-local-artifacts, build-global-artifacts, attest]
+    needs: [source, checks, plan, build-local-artifacts, build-global-artifacts, verify-distribution, attest]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -197,6 +216,7 @@ jobs:
           RELEASE_TAG: ${{ needs.source.outputs.tag }}
           RELEASE_SHA: ${{ needs.source.outputs.sha }}
         run: |
+          bash .github/scripts/verify-artifacts.sh artifacts
           jq -r .announcement_github_body artifacts/plan-dist-manifest.json > "$RUNNER_TEMP/release-notes.md"
           title=$(jq -r .announcement_title artifacts/plan-dist-manifest.json)
           prerelease=()
