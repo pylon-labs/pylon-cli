@@ -57,7 +57,13 @@ The Pylon monorepo owns generation config, distribution config, tests, and this 
 
 Run `cargo build --locked`, `cargo test --locked --lib`, `python3 tests/smoke.py`, and `python3 tests/security.py` to check a generated CLI. Integration checks use a local mock API and fake tokens.
 
-After merging a sync PR, update the Cargo package version and lockfile, commit them, and push a matching `v`-prefixed tag (for example, `v0.1.0`). The release workflow builds platform archives and shell/PowerShell installers, then publishes a GitHub Release. Merging a PR alone does not publish a release. Homebrew and npm are not configured. macOS builds do not use an Apple signing certificate; release archives have GitHub provenance attestations.
+To release, first merge a reviewed version bump with passing checks. A maintainer or administrator creates the matching tag on current `main` (for example, `v0.1.0`), then opens **Actions → Release → Run workflow**, selects `main`, and supplies that tag. Tag pushes and PR merges do not publish automatically.
+
+The release workflow verifies the maintainer's permissions and requires the tag, checked-out source, Cargo version, and current reviewed `main` to match. It reruns the same Linux/macOS/Windows tests and dependency audit for that exact source, builds every platform, and attests the artifacts. Before publication it revalidates the source, creates a draft, uploads every asset, and publishes the complete immutable GitHub Release. No second person is required to click the release button; changes to `main` still require another review. Existing version tags cannot be rewritten or deleted.
+
+The dependency audit uses pinned `cargo-audit` and fails on vulnerabilities or warnings, without ignored advisories. A weekly scheduled run checks for newly reported advisories. The monorepo owns the reviewed dependency lockfile so regeneration cannot restore vulnerable versions. Update dependency customizations and that lockfile together when upgrading.
+
+Homebrew and npm are not configured. macOS builds do not use an Apple signing certificate; release archives and installers have GitHub provenance attestations. The cargo-dist executable used by CI is checked against a committed SHA-256 before execution.
 
 ## Attribution
 
