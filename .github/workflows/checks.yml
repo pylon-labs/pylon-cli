@@ -61,6 +61,8 @@ jobs:
           python-version: '3.13'
       - name: Verify release source and authorization policy
         run: python tests/release_source.py
+      - name: Verify artifact validation rejects incomplete or altered bundles
+        run: python tests/distribution.py
 
   release-ready:
     name: release-ready
