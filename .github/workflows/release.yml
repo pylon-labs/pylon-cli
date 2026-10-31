@@ -71,6 +71,7 @@ jobs:
           path: plan-dist-manifest.json
 
   build-local-artifacts:
+    name: build (${{ join(matrix.targets, ', ') }})
     if: ${{ !cancelled() && needs.source.result == 'success' && needs.plan.result == 'success' }}
     needs: [source, plan]
     strategy:

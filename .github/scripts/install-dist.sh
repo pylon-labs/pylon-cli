@@ -33,10 +33,12 @@ if [[ "${dist_actual%% *}" != "$dist_sha" ]]; then
 fi
 if [[ "$dist_suffix" == zip ]]; then
 	unzip -q "$dist_work/$dist_archive" -d "$dist_work"
+	dist_source="$dist_work/$dist_binary"
 else
 	tar -xJf "$dist_work/$dist_archive" -C "$dist_work"
+	dist_source="$dist_work/cargo-dist-$dist_host/$dist_binary"
 fi
 mkdir -p "$RUNNER_TEMP/pylon-dist/bin"
-cp "$dist_work/cargo-dist-$dist_host/$dist_binary" "$RUNNER_TEMP/pylon-dist/bin/$dist_binary"
+cp "$dist_source" "$RUNNER_TEMP/pylon-dist/bin/$dist_binary"
 chmod +x "$RUNNER_TEMP/pylon-dist/bin/$dist_binary"
 echo "$RUNNER_TEMP/pylon-dist/bin" >> "$GITHUB_PATH"
