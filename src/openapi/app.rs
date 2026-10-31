@@ -5258,8 +5258,8 @@ mod tests {
         let tmp = tempfile::NamedTempFile::new().unwrap();
         std::fs::write(tmp.path(), b"hello").unwrap();
         let path = tmp.path().to_str().unwrap();
-        let data_ref = format!(r#"{{"content":"@data://{path}","filename":"a.txt"}}"#);
-        let text_ref = format!(r#"{{"content":"@{path}","filename":"b.txt"}}"#);
+        let data_ref = serde_json::json!({"content": format!("@data://{path}"), "filename": "a.txt"}).to_string();
+        let text_ref = serde_json::json!({"content": format!("@{path}"), "filename": "b.txt"}).to_string();
         let method = object_list_method("attachments");
         let matches = object_list_matches("attachments", &[&data_ref, &text_ref]);
         let result = collect_params_from_flags(&matches, &method, None).unwrap();
@@ -5277,7 +5277,7 @@ mod tests {
         let tmp = tempfile::NamedTempFile::new().unwrap();
         std::fs::write(tmp.path(), b"hello").unwrap();
         let path = tmp.path().to_str().unwrap();
-        let value = format!(r#"[{{"type":"text/plain","value":"@{path}"}}]"#);
+        let value = serde_json::json!([{"type": "text/plain", "value": format!("@{path}")}]).to_string();
         let method = object_list_method("content");
         let matches = object_list_matches("content", &[&value]);
         let result = collect_params_from_flags(&matches, &method, None).unwrap();
