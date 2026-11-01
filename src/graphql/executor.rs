@@ -20,7 +20,7 @@ use crate::graphql::discovery::{
 pub struct PaginationConfig {
     /// Whether to auto-paginate through all pages.
     pub page_all: bool,
-    /// Maximum number of pages to fetch (default: 10).
+    /// Maximum number of pages to fetch; zero means unlimited (default).
     pub page_limit: u32,
     /// Delay between page fetches in milliseconds (default: 100).
     pub page_delay_ms: u64,
@@ -34,7 +34,7 @@ impl Default for PaginationConfig {
     fn default() -> Self {
         Self {
             page_all: false,
-            page_limit: 10,
+            page_limit: 0,
             page_delay_ms: 100,
             no_pager: false,
             cli_name: String::new(),
@@ -186,7 +186,7 @@ async fn handle_json_response(
     pager: &mut Option<crate::pager::PagerHandle>,
 ) -> Result<(), CliError> {
     if let Ok(json_val) = serde_json::from_str::<Value>(body_text) {
-        *pages_fetched += 1;
+        *pages_fetched = pages_fetched.saturating_add(1);
 
         if capture_output {
             captured.push(json_val);
@@ -487,7 +487,11 @@ pub async fn execute_method(
         // cursor and POST again until we run out of pages or hit the limit.
         if pagination.page_all {
             if let Some(cursor) = extract_graphql_cursor(&response_body) {
-                if pages_fetched < pagination.page_limit {
+                if pagination.page_limit != 0 && pages_fetched >= pagination.page_limit {
+                    eprintln!("warning: --page-limit reached; more results remain. Output is incomplete. Increase --page-limit or resume from the returned cursor.");
+                    break;
+                }
+                if pagination.page_limit == 0 || pages_fetched < pagination.page_limit {
                     if let Some(ref gql_info) = method.graphql {
                         let params_clone = input.params.clone();
                         input.body = build_graphql_body(
@@ -836,7 +840,7 @@ mod tests {
     fn test_pagination_config_default() {
         let config = PaginationConfig::default();
         assert!(!config.page_all);
-        assert_eq!(config.page_limit, 10);
+        assert_eq!(config.page_limit, 0);
         assert_eq!(config.page_delay_ms, 100);
     }
 

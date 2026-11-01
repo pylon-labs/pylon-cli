@@ -2680,7 +2680,7 @@ impl AppContext {
         let entry = self.entry_for_method(method);
         let pagination = executor::PaginationConfig {
             page_all: false,
-            page_limit: 10,
+            page_limit: 0,
             page_delay_ms: 100,
             token_query_param: entry
                 .doc
@@ -2774,7 +2774,7 @@ impl AppContext {
         let entry = self.entry_for_method(method);
         let pagination = executor::PaginationConfig {
             page_all: false,
-            page_limit: 10,
+            page_limit: 0,
             page_delay_ms: 100,
             token_query_param: entry
                 .doc
@@ -3703,7 +3703,7 @@ pub(crate) fn build_pagination_config(
             .ok()
             .flatten()
             .copied()
-            .unwrap_or(10),
+            .unwrap_or(0),
         page_delay_ms: matches
             .try_get_one::<u64>("page-delay")
             .ok()
@@ -5663,7 +5663,7 @@ paths:
         let matches = pagination_cmd().get_matches_from(vec!["test"]);
         let config = build_pagination_config(&matches, &doc, "test");
         assert!(!config.page_all);
-        assert_eq!(config.page_limit, 10);
+        assert_eq!(config.page_limit, 0);
         assert_eq!(config.page_delay_ms, 100);
         assert_eq!(config.token_query_param, "pageToken");
         assert_eq!(config.token_response_path, "nextPageToken");

@@ -69,11 +69,10 @@ impl OutputPipeline {
     ///   2. the per-binary `<NAME>_OUTPUT` env var, if set to a valid format
     ///      (`NAME` is `app_name` uppercased with `-` → `_`, mirroring the
     ///      `<NAME>_LOG` logging convention);
-    ///   3. a TTY-aware default — `table` when stdout is an interactive
-    ///      terminal, `json` when piped or redirected.
+    ///   3. JSON in both interactive terminals and pipes.
     ///
     /// An invalid `<NAME>_OUTPUT` value is ignored (falls through to the
-    /// TTY-aware default), so a stray env var never breaks the CLI.
+    /// JSON default), so a stray env var never breaks the CLI.
     ///
     /// Returns `Err(FormatError::UnknownFormat)` for unrecognised
     /// `--format` values. Callers should map this into their error type
@@ -97,7 +96,7 @@ impl OutputPipeline {
                 // validated the stored value, so an unparseable one here can
                 // only come from a hand-edited file — treated the same way a
                 // bad `<NAME>_OUTPUT` is, by falling through to the
-                // TTY-aware default rather than failing the command.
+                // JSON default rather than failing the command.
                 let env_value = if crate::profiles::outranks_env() {
                     crate::profiles::format().or_else(|| std::env::var(env_var).ok())
                 } else {
@@ -301,23 +300,17 @@ impl OutputPipeline {
 ///
 /// Implements steps 2–3 of the [`OutputPipeline::from_matches`] precedence:
 ///   - if `env_value` is a valid format string, use it;
-///   - otherwise fall back to the TTY-aware default — [`OutputFormat::Table`]
-///     when stdout is an interactive terminal, [`OutputFormat::Json`] when
-///     piped or redirected.
+///   - otherwise fall back to [`OutputFormat::Json`] in both terminals and pipes.
 ///
 /// An unset or invalid `env_value` is treated identically (ignored), so a
 /// stray `<NAME>_OUTPUT` value never breaks the CLI.
 ///
-/// Pure (no IO) so it can be unit-tested by injecting `stdout_is_terminal`.
-fn resolve_default_format(env_value: Option<&str>, stdout_is_terminal: bool) -> OutputFormat {
+/// Terminal detection is retained for generator compatibility; it does not affect the default.
+fn resolve_default_format(env_value: Option<&str>, _stdout_is_terminal: bool) -> OutputFormat {
     if let Some(parsed) = env_value.and_then(|v| OutputFormat::parse(v).ok()) {
         return parsed;
     }
-    if stdout_is_terminal {
-        OutputFormat::Table
-    } else {
-        OutputFormat::Json
-    }
+    OutputFormat::Json
 }
 
 /// Supported output formats.
@@ -385,7 +378,7 @@ impl OutputFormat {
 /// load before any `ArgMatches` exists), but it must land on the same format
 /// the success path would have chosen, so this mirrors
 /// [`OutputPipeline::from_matches`]: an explicit `--format` or `--human`
-/// wins, then `<NAME>_OUTPUT`, then the TTY-aware default. Unknown `--format`
+/// wins, then `<NAME>_OUTPUT`, then the JSON default. Unknown `--format`
 /// values fall through to the default rather than erroring — the format
 /// resolution performed by clap already reports those.
 pub fn resolve_format_from_raw_args(args: &[String], app_name: &str) -> OutputFormat {
@@ -1548,7 +1541,7 @@ mod tests {
     }
 
     // -----------------------------------------------------------------------
-    // Default-format precedence: flag > <NAME>_OUTPUT env > TTY-aware default
+    // Default-format precedence: flag > <NAME>_OUTPUT env > JSON default
     // -----------------------------------------------------------------------
 
     #[test]
@@ -1606,7 +1599,7 @@ mod tests {
         // `--json` is the request-body flag on every endpoint that has a body;
         // treating it as an output format would make sending a body silently
         // pin the rendering too. With stdout not a terminal under test, the
-        // TTY-aware default applies either way — what matters is that the flag
+        // JSON default applies either way — what matters is that the flag
         // itself carries no format meaning.
         assert_eq!(
             resolve_format_from_raw_args(
@@ -1687,14 +1680,14 @@ mod tests {
     }
 
     #[test]
-    fn resolve_default_format_no_env_terminal_is_table() {
-        // No env override + interactive terminal → table.
-        assert_eq!(resolve_default_format(None, true), OutputFormat::Table);
+    fn resolve_default_format_no_env_terminal_is_json() {
+        // No env override + interactive terminal → JSON.
+        assert_eq!(resolve_default_format(None, true), OutputFormat::Json);
     }
 
     #[test]
-    fn resolve_default_format_valid_env_wins_over_tty_default() {
-        // A valid env value beats the TTY-aware default in both directions.
+    fn resolve_default_format_valid_env_wins_over_json_default() {
+        // A valid env value beats the JSON default in both directions.
         assert_eq!(
             resolve_default_format(Some("yaml"), true),
             OutputFormat::Yaml,
@@ -1714,21 +1707,21 @@ mod tests {
     }
 
     #[test]
-    fn resolve_default_format_invalid_env_falls_back_to_tty_default() {
-        // A bogus env value is ignored — the TTY-aware default applies.
+    fn resolve_default_format_invalid_env_falls_back_to_json_default() {
+        // A bogus env value is ignored — the JSON default applies.
         assert_eq!(
             resolve_default_format(Some("garbage"), false),
             OutputFormat::Json,
         );
         assert_eq!(
             resolve_default_format(Some("garbage"), true),
-            OutputFormat::Table,
+            OutputFormat::Json,
         );
     }
 
     #[test]
-    fn resolve_default_format_empty_env_falls_back_to_tty_default() {
-        // An empty env value parses as unknown → TTY default.
+    fn resolve_default_format_empty_env_falls_back_to_json_default() {
+        // An empty env value falls back to JSON.
         assert_eq!(resolve_default_format(Some(""), false), OutputFormat::Json);
     }
 

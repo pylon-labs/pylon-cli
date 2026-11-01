@@ -1275,7 +1275,7 @@ fn prefix_schema_operations(value: serde_json::Value, namespace: &str) -> serde_
 /// Attach an operation's `x-fern-cli-table` columns to `pipeline`.
 ///
 /// `--columns` asks for a table, so it switches the default format (JSON
-/// when piped, or `<NAME>_OUTPUT`) to `table`. It is rejected next to an
+/// or `<NAME>_OUTPUT`) to `table`. It is rejected next to an
 /// explicit non-table `--format` or a `--query`, which already picks fields.
 /// The global output settings plus the operation's `x-fern-cli-table`
 /// columns and `--columns` selection.

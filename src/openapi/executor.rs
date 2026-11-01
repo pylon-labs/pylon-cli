@@ -329,7 +329,7 @@ pub enum MultipartPart {
 pub struct PaginationConfig {
     /// Whether to auto-paginate through all pages.
     pub page_all: bool,
-    /// Maximum number of pages to fetch (default: 10).
+    /// Maximum number of pages to fetch; zero means unlimited (default).
     pub page_limit: u32,
     /// Delay between page fetches in milliseconds (default: 100).
     pub page_delay_ms: u64,
@@ -348,7 +348,7 @@ impl Default for PaginationConfig {
     fn default() -> Self {
         Self {
             page_all: false,
-            page_limit: 10,
+            page_limit: 0,
             page_delay_ms: 100,
             token_query_param: "pageToken".to_string(),
             token_response_path: "nextPageToken".to_string(),
@@ -1536,7 +1536,7 @@ async fn handle_json_response(
         let output_val =
             extract_return_value(&json_val, return_path, no_extract, method_descriptor)?;
 
-        *pages_fetched += 1;
+        *pages_fetched = pages_fetched.saturating_add(1);
 
         // The three branches below are mutually exclusive (one consumes
         // `output_val`), so the unconditional move into `captured.push`
@@ -1567,7 +1567,7 @@ async fn handle_json_response(
 
         // Check whether to fetch a next page. Per-op `x-fern-pagination`
         // overrides the document heuristic when present.
-        if pagination.page_all && *pages_fetched < pagination.page_limit {
+        if pagination.page_all {
             let should_continue = match endpoint_pag {
                 Some(EndpointPagination::Cursor { next_cursor, .. }) => {
                     match get_nested_str(&json_val, next_cursor) {
@@ -1716,6 +1716,10 @@ async fn handle_json_response(
             };
 
             if should_continue {
+                if pagination.page_limit != 0 && *pages_fetched >= pagination.page_limit {
+                    eprintln!("warning: --page-limit reached; more results remain. Output is incomplete. Increase --page-limit or resume from the returned cursor.");
+                    return Ok(false);
+                }
                 if pagination.page_delay_ms > 0 {
                     tokio::time::sleep(std::time::Duration::from_millis(
                         pagination.page_delay_ms,
@@ -7816,7 +7820,7 @@ mod tests {
     fn test_pagination_config_default() {
         let config = PaginationConfig::default();
         assert!(!config.page_all);
-        assert_eq!(config.page_limit, 10);
+        assert_eq!(config.page_limit, 0);
         assert_eq!(config.page_delay_ms, 100);
     }
 

@@ -473,7 +473,7 @@ pub(crate) fn build_pagination_config(
         page_limit: matches
             .get_one::<u32>("page-limit")
             .copied()
-            .unwrap_or(10),
+            .unwrap_or(0),
         page_delay_ms: matches
             .get_one::<u64>("page-delay")
             .copied()

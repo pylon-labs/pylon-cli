@@ -235,7 +235,7 @@ pub(crate) fn build_cli_with_placeholders(doc: &RestDescription, placeholders: &
         .arg(
             clap::Arg::new("format")
                 .long("format")
-                .help("Output format: json, table, yaml, csv, raw, jsonl, http. Default: table when stdout is a TTY, json when piped. Override default with <NAME>_OUTPUT env var. raw emits unmodified server response bytes. jsonl emits one compact JSON value per line (NDJSON). http emits the full HTTP response (status line + headers + body).")
+                .help("Output format: json, table, yaml, csv, raw, jsonl, http. Default: json. Override default with <NAME>_OUTPUT env var. raw emits unmodified server response bytes. jsonl emits one compact JSON value per line (NDJSON). http emits the full HTTP response (status line + headers + body).")
                 .value_name("FORMAT")
                 .global(true),
         )
@@ -786,9 +786,9 @@ fn build_resource_command(
                 .arg(
                     Arg::new("page-limit")
                         .long("page-limit")
-                        .help("Maximum number of pages to fetch (default: 10)")
+                        .help("Maximum number of pages to fetch (default: unlimited); warns if more results remain")
                         .value_name("N")
-                        .value_parser(clap::value_parser!(u32))
+                        .value_parser(clap::value_parser!(u32).range(1..))
                         .help_heading(HELP_HEADING_REQUEST),
                 )
                 .arg(
