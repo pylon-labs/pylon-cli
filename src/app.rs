@@ -1340,7 +1340,7 @@ impl CliApp {
             .arg(
                 clap::Arg::new("format")
                     .long("format")
-                    .help("Output format: json, table, yaml, csv, raw, jsonl, http. Default: table when stdout is a TTY, json when piped. Override default with <NAME>_OUTPUT env var. raw emits unmodified server response bytes. jsonl emits one compact JSON value per line (NDJSON); arrays are flattened. http emits the full HTTP response (status line + headers + body) like curl -i (OpenAPI only).")
+                    .help("Output format: json, table, yaml, csv, raw, jsonl, http. Default: json. Override default with <NAME>_OUTPUT env var. raw emits unmodified server response bytes. jsonl emits one compact JSON value per line (NDJSON); arrays are flattened. http emits the full HTTP response (status line + headers + body) like curl -i (OpenAPI only).")
                     .value_name("FORMAT")
                     .global(true),
             )
@@ -2314,7 +2314,7 @@ fn global_flags(
         serde_json::json!({
             "flag": "--format",
             "valueName": "FORMAT",
-            "description": "Output format: json, table, yaml, csv, raw, jsonl, http. Default: table when stdout is a TTY, json when piped",
+            "description": "Output format: json, table, yaml, csv, raw, jsonl, http. Default: json",
         }),
         serde_json::json!({
             "flag": "--base-url",

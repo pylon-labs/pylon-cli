@@ -4,7 +4,7 @@ Command-line access to the [Pylon REST API](https://docs.usepylon.com/pylon-docs
 
 ## Install
 
-Once the first release is published, install on macOS or Linux:
+Install on macOS or Linux:
 
 ```sh
 curl --proto '=https' --tlsv1.2 -LsSf https://github.com/pylon-labs/pylon-cli/releases/latest/download/pylon-installer.sh | sh
@@ -40,11 +40,13 @@ JSON request bodies and object/array flags preserve strings literally, including
 
 ### Pagination and output
 
-**`--page-all` fetches at most 10 pages by default, and stops silently at that limit.** It does not guarantee a complete result. Set `--page-limit` explicitly for large exports, and check the final page's `pagination.cursor` before treating an export or count as complete. A nonempty cursor means more results remain.
+JSON is the default in both terminals and pipes, preserving the full API response. Use `--format table` (or `--human`) for a human-readable table. `PYLON_OUTPUT` can override the default; an explicit `--format` takes precedence.
+
+Commands fetch one page unless `--page-all` is set. `--page-all` follows pagination until no next cursor remains. Use `--page-limit N` for an explicit positive page cap; the CLI warns on stderr if it reaches that cap while more results remain. A nonempty `pagination.cursor` means more results remain. Failed requests return a nonzero exit code, even if earlier pages were already printed.
 
 ```sh
 pylon issues search --json '{"filter":{"field":"state","operator":"equals","value":"waiting_on_customer"}}' \
-  --page-all --page-limit 1000 --page-delay 500 --format jsonl > pages.jsonl
+  --page-all --page-delay 500 --format jsonl > pages.jsonl
 ```
 
 The API response envelope is preserved: `data`, `pagination`, and `request_id`. Without `--query`, the export above contains one page per line. For a single page, project rows with `--query 'data[]'`. With `--page-all`, queries run over the collected pages, so use `--query '[].data[]'`. A query can hide the cursor; export the envelopes first when you need to verify completeness. `--page-delay` is in milliseconds; rate limits are shared across all callers in the organization.
@@ -59,7 +61,7 @@ Run `cargo build --locked`, `cargo test --locked --lib`, `python3 tests/smoke.py
 
 To release, first merge a reviewed version bump with passing checks. A maintainer or administrator creates the matching tag on current `main` (for example, `v0.1.0`), then opens **Actions → Release → Run workflow**, selects `main`, and supplies that tag. Tag pushes and PR merges do not publish automatically.
 
-The release workflow verifies the maintainer's permissions and requires the tag, checked-out source, Cargo version, and current reviewed `main` to match. It reruns the same Linux/macOS/Windows tests and dependency audit for that exact source, builds every platform, and attests the artifacts. Before publication it revalidates the source, creates a draft, uploads every asset, and publishes the complete immutable GitHub Release. No second person is required to click the release button; changes to `main` still require another review. Existing version tags cannot be rewritten or deleted.
+The release workflow verifies the maintainer's permissions and requires the tag, checked-out source, Cargo version, and current reviewed `main` to match. It reruns the same Linux/macOS/Windows tests and dependency audit for that exact source, builds every platform, and attests the artifacts. Before publication it revalidates the source, creates a draft, uploads every asset, and publishes the complete immutable GitHub Release. No second person is required to click the release button or approve a PR; changes to `main` still require a PR and passing checks. Existing version tags cannot be rewritten or deleted.
 
 Branch protection requires both `release-ready` and `verify-distribution`. The distribution check assembles the same downloads used for publication, requires a complete flat bundle, and verifies archive checksums. Publication repeats that validation before creating a draft.
 

@@ -153,7 +153,7 @@ fn render_shared_skill(
     );
     let _ = writeln!(
         out,
-        "| `--format <FMT>` | Output format: `json`, `table`, `yaml`, `csv`, `raw`, `jsonl`, `http` | `table` on a TTY, `json` when piped |"
+        "| `--format <FMT>` | Output format: `json`, `table`, `yaml`, `csv`, `raw`, `jsonl`, `http` | `json` |"
     );
     let _ = writeln!(
         out,
@@ -185,7 +185,7 @@ fn render_shared_skill(
         );
         let _ = writeln!(
             out,
-            "| `--page-limit <N>` | Max pages to fetch | `10` |"
+            "| `--page-limit <N>` | Max pages to fetch; warns if incomplete | Unlimited |"
         );
         let _ = writeln!(
             out,
@@ -699,10 +699,9 @@ mod tests {
         assert!(shared.contains("## Global Flags"));
         assert!(shared.contains("--dry-run"));
         assert!(shared.contains("--format"));
-        // The `--format` default is TTY-dependent; advertising `json` was
-        // simply wrong (subcommand `--help` has always stated it correctly).
+        // Agent instructions must match the JSON default advertised in --help.
         assert!(
-            shared.contains("`table` on a TTY, `json` when piped"),
+            shared.contains("`json`"),
             "shared skill must state the real --format default: {shared}",
         );
     }
