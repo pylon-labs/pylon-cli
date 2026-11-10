@@ -5,10 +5,14 @@ on:
   pull_request:
   workflow_dispatch:
     inputs:
-      tag:
-        description: 'Existing version tag on current reviewed main (for example v0.1.0)'
+      version:
+        description: 'Version to release (for example 0.1.2)'
         type: string
-        required: true
+        required: false
+      tag:
+        description: 'Recovery only: existing version tag on current reviewed main; omit version'
+        type: string
+        required: false
 
 permissions:
   contents: read
@@ -20,6 +24,7 @@ concurrency:
 jobs:
   source:
     runs-on: ubuntu-24.04
+    timeout-minutes: 55
     outputs:
       sha: ${{ steps.source.outputs.sha }}
       tag: ${{ steps.source.outputs.tag }}
@@ -29,11 +34,39 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-      - name: Validate reviewed release source and maintainer
+      - name: Authorize release preparation
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          AUTHORIZE_ONLY: 'true'
+          REQUESTED_VERSION: ${{ inputs.version }}
+          REQUESTED_TAG: ${{ inputs.tag }}
+        run: bash .github/scripts/verify-release-source.sh
+      - name: Create release app token
+        if: github.event_name == 'workflow_dispatch' && inputs.version != ''
+        id: release-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: pylon-cli
+          permission-contents: write
+          permission-pull-requests: write
+          permission-checks: read
+          permission-statuses: read
+      - name: Merge checked version bump and create tag
+        if: github.event_name == 'workflow_dispatch' && inputs.version != ''
+        id: prepare
+        env:
+          GH_TOKEN: ${{ steps.release-token.outputs.token }}
+          VERSION: ${{ inputs.version }}
+        run: bash .github/scripts/prepare-release.sh
+      - name: Validate reviewed release source and publisher
         id: source
         env:
           GH_TOKEN: ${{ github.token }}
-          REQUESTED_TAG: ${{ inputs.tag }}
+          REQUESTED_TAG: ${{ steps.prepare.outputs.tag || inputs.tag }}
         run: bash .github/scripts/verify-release-source.sh
 
   checks:
