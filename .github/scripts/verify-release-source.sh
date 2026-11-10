@@ -11,14 +11,21 @@ if [[ "$GITHUB_REF" != refs/heads/main ]]; then
 	echo 'Start releases from the protected main workflow.' >&2
 	exit 1
 fi
-if [[ ! "$REQUESTED_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
-	echo 'A release tag must be vMAJOR.MINOR.PATCH, optionally with a prerelease suffix.' >&2
-	exit 1
-fi
 release_actor="${GITHUB_TRIGGERING_ACTOR:-$GITHUB_ACTOR}"
 release_role=$(gh api "repos/$GITHUB_REPOSITORY/collaborators/$release_actor/permission" --jq .role_name)
-if [[ "$release_role" != admin && "$release_role" != maintain ]]; then
-	echo 'A repository maintainer or administrator must start the release.' >&2
+if [[ "$release_role" != admin && "$release_role" != maintain && "$release_role" != write ]]; then
+	echo 'A repository writer, maintainer, or administrator must start the release.' >&2
+	exit 1
+fi
+if [[ "${AUTHORIZE_ONLY:-false}" == true ]]; then
+	if [[ -n "${REQUESTED_VERSION:-}" && -n "${REQUESTED_TAG:-}" ]] || [[ -z "${REQUESTED_VERSION:-}" && -z "${REQUESTED_TAG:-}" ]]; then
+		echo 'Supply exactly one of version or tag.' >&2
+		exit 1
+	fi
+	exit 0
+fi
+if [[ ! "$REQUESTED_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+	echo 'A release tag must be vMAJOR.MINOR.PATCH, optionally with a prerelease suffix.' >&2
 	exit 1
 fi
 git fetch --quiet --no-tags origin '+refs/heads/main:refs/remotes/origin/main' \
