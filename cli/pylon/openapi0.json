@@ -231,6 +231,7 @@
                   "data": {
                     "body_html": "<p>I can't sign in to the dashboard.</p>",
                     "created_at": "2025-01-02T15:04:05Z",
+                    "customer_portal_title": "",
                     "customer_portal_visible": false,
                     "id": "issue_123",
                     "is_issue_group": false,
@@ -514,6 +515,16 @@
         },
         "description": ""
       },
+      "DeleteRouteRedirectResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/DeleteRouteRedirectResponseBody"
+            }
+          }
+        },
+        "description": ""
+      },
       "DeleteTagResponse": {
         "content": {
           "application/json": {
@@ -539,6 +550,16 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/DeleteTaskResponseBody"
+            }
+          }
+        },
+        "description": ""
+      },
+      "DeleteTeamResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/DeleteTeamResponseBody"
             }
           }
         },
@@ -573,6 +594,16 @@
           }
         },
         "description": "The authenticated caller or organization is not allowed to access this endpoint or operation."
+      },
+      "GetAccountFilesResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/GetAccountFilesResponseBody"
+            }
+          }
+        },
+        "description": ""
       },
       "GetAccountNotebookNotesResponse": {
         "content": {
@@ -824,6 +855,7 @@
                   "data": {
                     "body_html": "<p>I can't sign in to the dashboard.</p>",
                     "created_at": "2025-01-02T15:04:05Z",
+                    "customer_portal_title": "",
                     "customer_portal_visible": false,
                     "id": "issue_123",
                     "is_issue_group": false,
@@ -991,6 +1023,16 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/GetProjectResponseBody"
+            }
+          }
+        },
+        "description": ""
+      },
+      "GetRouteRedirectsResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/GetRouteRedirectsResponseBody"
             }
           }
         },
@@ -1525,6 +1567,16 @@
         },
         "description": ""
       },
+      "SendCustomerPortalInvitationResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SendCustomerPortalInvitationResponseBody"
+            }
+          }
+        },
+        "description": ""
+      },
       "SetFeatureRequestPortalVisibilityResponse": {
         "content": {
           "application/json": {
@@ -1545,6 +1597,7 @@
                   "data": {
                     "body_html": "<p>I can't sign in to the dashboard.</p>",
                     "created_at": "2025-01-02T15:04:05Z",
+                    "customer_portal_title": "",
                     "customer_portal_visible": false,
                     "id": "issue_123",
                     "is_issue_group": false,
@@ -1754,6 +1807,7 @@
                   "data": {
                     "body_html": "<p>I can't sign in to the dashboard.</p>",
                     "created_at": "2025-01-02T15:04:05Z",
+                    "customer_portal_title": "",
                     "customer_portal_visible": false,
                     "id": "issue_123",
                     "is_issue_group": false,
@@ -2159,6 +2213,52 @@
         ],
         "type": "object",
         "x-go-package": "pylon/api/apiserver/apitypes"
+      },
+      "AccountFile": {
+        "properties": {
+          "created_at": {
+            "description": "When the file was uploaded, in RFC 3339 format.",
+            "format": "date-time",
+            "type": "string",
+            "x-go-name": "CreatedAt"
+          },
+          "file_type": {
+            "description": "The file's MIME type.",
+            "type": "string",
+            "x-go-name": "FileType"
+          },
+          "id": {
+            "description": "The ID of the file.",
+            "type": "string",
+            "x-go-name": "ID"
+          },
+          "name": {
+            "description": "The file name.",
+            "type": "string",
+            "x-go-name": "Name"
+          },
+          "updated_at": {
+            "description": "When the file was last replaced or renamed, in RFC 3339 format.",
+            "format": "date-time",
+            "type": "string",
+            "x-go-name": "UpdatedAt"
+          },
+          "url": {
+            "description": "The URL to download the file from.",
+            "type": "string",
+            "x-go-name": "URL"
+          }
+        },
+        "required": [
+          "created_at",
+          "file_type",
+          "id",
+          "name",
+          "updated_at",
+          "url"
+        ],
+        "type": "object",
+        "x-go-package": "pylon/api/apiserver/endpoints"
       },
       "AccountHighlight": {
         "properties": {
@@ -2719,6 +2819,11 @@
           },
           "customer_visibility_condition": {
             "$ref": "#/components/schemas/Filter"
+          },
+          "customer_visibility_condition_unsupported": {
+            "description": "Read-only. True when the article's customer visibility condition cannot be expressed in the\nAPI filter format. The condition still applies, but customer_visibility_condition is omitted.",
+            "type": "boolean",
+            "x-go-name": "CustomerVisibilityConditionUnsupported"
           },
           "visibility": {
             "description": "The visibility setting.",
@@ -3993,13 +4098,28 @@
             "type": "string",
             "x-go-name": "Description"
           },
+          "instructions": {
+            "description": "Field-wide instructions for how AI should populate the field. For AI-enabled fields, an empty value falls back to description.",
+            "type": "string",
+            "x-go-name": "Instructions"
+          },
+          "is_ai_enabled": {
+            "description": "Whether AI should populate the field. Web research fields are always AI-enabled.",
+            "type": "boolean",
+            "x-go-name": "IsAIEnabled"
+          },
+          "json_schema": {
+            "description": "JSON schema for structured web research results. Required for contact web research fields.",
+            "type": "string",
+            "x-go-name": "JSONSchema"
+          },
           "label": {
             "description": "The label of the custom field.",
             "type": "string",
             "x-go-name": "Label"
           },
           "object_type": {
-            "description": "The object type of the custom field. Can be \"account\", \"issue\", \"contact\", \"task\", \"project\", \"meeting\", or \"opportunity\".",
+            "description": "The object type of the custom field. Can be \"account\", \"issue\", \"contact\", \"task\", \"project\", \"meeting\", \"opportunity\", or \"feature_request\".",
             "enum": [
               "account",
               "issue",
@@ -4007,7 +4127,8 @@
               "task",
               "project",
               "meeting",
-              "opportunity"
+              "opportunity",
+              "feature_request"
             ],
             "example": "account",
             "type": "string",
@@ -4027,7 +4148,7 @@
             "x-go-name": "Slug"
           },
           "type": {
-            "description": "The type of the custom field. Can be one of `text`, `number`, `decimal`, `boolean`, `date`, `datetime`, `user`, `url`, `select`, or `multiselect`.",
+            "description": "The type of the custom field. Can be one of `text`, `number`, `boolean`, `date`, `datetime`, `user`, `url`, `select`, `multiselect`, or `web_research`. Number fields accept integers and fractional values, such as 7.4; decimal is not a separate field type. Web research is supported for accounts and for contacts when enabled for the organization.",
             "example": "text",
             "type": "string",
             "x-go-name": "Type"
@@ -4991,19 +5112,18 @@
             "x-go-name": "Language"
           },
           "object_id": {
-            "description": "The ID of the object to redirect to.",
+            "description": "The ID of the article or collection to redirect to. Omit when object_type is \"knowledgebase\".",
             "type": "string",
             "x-go-name": "ObjectID"
           },
           "object_type": {
-            "description": "The type of the object to redirect to. Must be \"article\" or \"collection\".",
+            "description": "The type of the object to redirect to: \"article\", \"collection\", or \"knowledgebase\" for the knowledge base homepage.",
             "type": "string",
             "x-go-name": "ObjectType"
           }
         },
         "required": [
           "from_path",
-          "object_id",
           "object_type"
         ],
         "type": "object",
@@ -5371,6 +5491,29 @@
         "type": "object",
         "x-go-package": "pylon/api/apiserver/endpoints"
       },
+      "CustomFieldActor": {
+        "properties": {
+          "type": {
+            "description": "\"user\" for a change made by a user, \"system\" for an automated change, such as AI-generated option descriptions, and \"unknown\" for a change made before authors were recorded.\n\nKnown values: `user`, `system`, `unknown`. This list is not exhaustive.",
+            "type": "string",
+            "x-extensible-enum": [
+              "user",
+              "system",
+              "unknown"
+            ],
+            "x-go-enum-desc": "user CustomFieldActorTypeUser\nsystem CustomFieldActorTypeSystem\nunknown CustomFieldActorTypeUnknown",
+            "x-go-name": "Type"
+          },
+          "user": {
+            "$ref": "#/components/schemas/MiniUser"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "type": "object",
+        "x-go-package": "pylon/api/apiserver/apitypes"
+      },
       "CustomFieldDefinition": {
         "properties": {
           "created_at": {
@@ -5378,6 +5521,14 @@
             "format": "date-time",
             "type": "string",
             "x-go-name": "CreatedAt"
+          },
+          "created_by": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CustomFieldActor"
+              }
+            ],
+            "nullable": true
           },
           "default_value": {
             "description": "The default value for single-valued custom fields.",
@@ -5402,10 +5553,25 @@
             "type": "string",
             "x-go-name": "ID"
           },
+          "instructions": {
+            "description": "Field-wide instructions for how AI populates the field.",
+            "type": "string",
+            "x-go-name": "Instructions"
+          },
+          "is_ai_enabled": {
+            "description": "Whether AI is enabled for the field.",
+            "type": "boolean",
+            "x-go-name": "IsAIEnabled"
+          },
           "is_read_only": {
             "description": "Whether the custom field is read only. Fields synced from apps and integrations are read-only.",
             "type": "boolean",
             "x-go-name": "IsReadOnly"
+          },
+          "json_schema": {
+            "description": "JSON schema for structured web research results, when configured.",
+            "type": "string",
+            "x-go-name": "JSONSchema"
           },
           "label": {
             "description": "The label of the custom field.",
@@ -5420,6 +5586,14 @@
             "example": "account",
             "type": "string",
             "x-go-name": "ObjectType"
+          },
+          "requirement": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CustomFieldRequirement"
+              }
+            ],
+            "nullable": true
           },
           "select_metadata": {
             "$ref": "#/components/schemas/SelectMetadata"
@@ -5445,19 +5619,35 @@
             "format": "date-time",
             "type": "string",
             "x-go-name": "UpdatedAt"
+          },
+          "updated_by": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CustomFieldActor"
+              }
+            ],
+            "nullable": true
+          },
+          "visible_by_default": {
+            "description": "Whether the custom field shows on records in Pylon by default. When false, it shows only where a field visibility condition makes it visible.",
+            "type": "boolean",
+            "x-go-name": "VisibleByDefault"
           }
         },
         "required": [
           "created_at",
           "description",
           "id",
+          "instructions",
+          "is_ai_enabled",
           "is_read_only",
           "label",
           "object_type",
           "slug",
           "source",
           "type",
-          "updated_at"
+          "updated_at",
+          "visible_by_default"
         ],
         "type": "object",
         "x-go-package": "pylon/api/apiserver/apitypes"
@@ -5483,6 +5673,34 @@
         "type": "object",
         "x-go-package": "pylon/api/apiserver/apitypes"
       },
+      "CustomFieldRequirement": {
+        "properties": {
+          "filter": {
+            "$ref": "#/components/schemas/Filter"
+          },
+          "filter_unsupported": {
+            "description": "Whether the requirement has conditions that can't be expressed as an API filter. When true, filter is omitted.",
+            "type": "boolean",
+            "x-go-name": "FilterUnsupported"
+          },
+          "setting": {
+            "description": "When the custom field is required. \"required_for_closed\" requires it when closing an issue, and \"required_under_certain_conditions\" requires it on issues that match filter.\n\nKnown values: `not_required`, `required`, `required_for_closed`, `required_under_certain_conditions`. This list is not exhaustive.",
+            "type": "string",
+            "x-extensible-enum": [
+              "not_required",
+              "required",
+              "required_for_closed",
+              "required_under_certain_conditions"
+            ],
+            "x-go-name": "Setting"
+          }
+        },
+        "required": [
+          "setting"
+        ],
+        "type": "object",
+        "x-go-package": "pylon/api/apiserver/apitypes"
+      },
       "CustomFieldValue": {
         "description": "A custom field value to set. Custom fields not listed in a write request are left unchanged.",
         "properties": {
@@ -5492,7 +5710,7 @@
             "x-go-name": "Slug"
           },
           "value": {
-            "description": "The value of the custom field. Only to be used for single-valued custom fields. If unset, the custom field will be unset. If the custom field is a select field, the value must be the select option slug, which you can find from the GET /custom-fields endpoint. If the custom field is a relationship field, the value must be the related object ID.",
+            "description": "The value of the custom field. Only to be used for single-valued custom fields. If unset, the custom field will be unset. If the custom field is a select field, the value must be the select option slug, which you can find from the GET /custom-fields endpoint. If the custom field is a relationship field, the value must be the related object ID. If the custom field is a date or datetime field, the value must be an RFC3339 timestamp, such as 2026-01-31T00:00:00Z.",
             "type": "string",
             "x-go-name": "Value"
           },
@@ -5537,6 +5755,20 @@
           "external_id"
         ],
         "title": "CustomSourceInfo contains metadata for messages on custom source issues.",
+        "type": "object",
+        "x-go-package": "pylon/api/apiserver/endpoints"
+      },
+      "CustomerPortalInvitationResult": {
+        "properties": {
+          "accepted": {
+            "description": "Whether the invitation was accepted for sending. This does not guarantee email delivery.",
+            "type": "boolean",
+            "x-go-name": "Accepted"
+          }
+        },
+        "required": [
+          "accepted"
+        ],
         "type": "object",
         "x-go-package": "pylon/api/apiserver/endpoints"
       },
@@ -5799,6 +6031,20 @@
         "type": "object",
         "x-go-package": "pylon/api/apiserver/endpoints"
       },
+      "DeleteRouteRedirectResponseBody": {
+        "properties": {
+          "request_id": {
+            "description": "The request ID for tracking.",
+            "type": "string",
+            "x-go-name": "RequestID"
+          }
+        },
+        "required": [
+          "request_id"
+        ],
+        "type": "object",
+        "x-go-package": "pylon/api/apiserver/endpoints"
+      },
       "DeleteTagResponseBody": {
         "properties": {
           "request_id": {
@@ -5828,6 +6074,20 @@
         "x-go-package": "pylon/api/apiserver/endpoints"
       },
       "DeleteTaskResponseBody": {
+        "properties": {
+          "request_id": {
+            "description": "The request ID for tracking.",
+            "type": "string",
+            "x-go-name": "RequestID"
+          }
+        },
+        "required": [
+          "request_id"
+        ],
+        "type": "object",
+        "x-go-package": "pylon/api/apiserver/endpoints"
+      },
+      "DeleteTeamResponseBody": {
         "properties": {
           "request_id": {
             "description": "The request ID for tracking.",
@@ -6152,12 +6412,13 @@
             "x-go-name": "ID"
           },
           "reason": {
-            "description": "Why the address is suppressed.\n\nKnown values: `hard_bounce`, `manual`. This list is not exhaustive.",
+            "description": "Why the address is suppressed.\n\nKnown values: `hard_bounce`, `manual`, `spam_complaint`. This list is not exhaustive.",
             "example": "hard_bounce",
             "type": "string",
             "x-extensible-enum": [
               "hard_bounce",
-              "manual"
+              "manual",
+              "spam_complaint"
             ],
             "x-go-name": "Reason"
           }
@@ -6174,7 +6435,7 @@
       "ErrorApiResponseBody": {
         "properties": {
           "code": {
-            "description": "A stable machine-readable identifier for this failure, safe to branch on\ninstead of the message text. Omitted when the failure has no assigned code.\n\nKnown values: `recipients_suppressed`, `email_bounced`, `internal_issue_reply_not_allowed`, `duplicate_object`, `invalid_authorization_header`, `invalid_api_token`, `invalid_oauth_token`, `wrong_region_token`, `organization_deactivated`, `organization_suspended`, `permission_denied`, `oauth_not_permitted`, `rate_limited`, `not_found`, `method_not_allowed`, `payload_too_large`, `invalid_request_body`, `internal_error`, `invalid_webhook_credentials`, `organization_inactive`. This list is not exhaustive.",
+            "description": "A stable machine-readable identifier for this failure, safe to branch on\ninstead of the message text. Omitted when the failure has no assigned code.\n\nKnown values: `recipients_suppressed`, `email_bounced`, `internal_issue_reply_not_allowed`, `duplicate_object`, `invalid_authorization_header`, `invalid_api_token`, `invalid_oauth_token`, `wrong_region_token`, `organization_deactivated`, `organization_suspended`, `permission_denied`, `oauth_not_permitted`, `rate_limited`, `not_found`, `method_not_allowed`, `payload_too_large`, `invalid_request_body`, `internal_error`, `invalid_webhook_credentials`, `organization_inactive`, `invalid_filter`. This list is not exhaustive.",
             "type": "string",
             "x-enumDescriptions": {
               "duplicate_object": "The object already exists; its ID is returned in exists_id.",
@@ -6183,6 +6444,7 @@
               "internal_issue_reply_not_allowed": "A customer-facing reply was attempted on an internal issue.",
               "invalid_api_token": "The API token was rejected. Covers every reason a token is not accepted.",
               "invalid_authorization_header": "The Authorization header is missing or does not use the Bearer scheme.",
+              "invalid_filter": "The request's filter is invalid; filter_errors lists each problem.",
               "invalid_oauth_token": "The OAuth token was rejected.",
               "invalid_request_body": "The request body could not be read or parsed.",
               "invalid_webhook_credentials": "The inbound webhook credentials were rejected.",
@@ -6218,9 +6480,10 @@
               "invalid_request_body",
               "internal_error",
               "invalid_webhook_credentials",
-              "organization_inactive"
+              "organization_inactive",
+              "invalid_filter"
             ],
-            "x-go-enum-desc": "recipients_suppressed APIErrorCodeRecipientsSuppressed  Every To recipient of the outbound email is on the organization's suppression list.\nemail_bounced APIErrorCodeEmailBounced  The email provider rejected a recipient as inactive. Inactive covers a hard  bounce, a spam complaint, or a manual suppression at the provider.\ninternal_issue_reply_not_allowed APIErrorCodeInternalIssueReplyNotAllowed  A customer-facing reply was attempted on an internal issue.\nduplicate_object APIErrorCodeDuplicateObject  The object already exists; its ID is returned in exists_id.\ninvalid_authorization_header APIErrorCodeInvalidAuthorizationHeader  The Authorization header is missing or does not use the Bearer scheme.\ninvalid_api_token APIErrorCodeInvalidAPIToken  The API token was rejected. Covers every reason a token is not accepted.\ninvalid_oauth_token APIErrorCodeInvalidOAuthToken  The OAuth token was rejected.\nwrong_region_token APIErrorCodeWrongRegionToken  The token belongs to another region; use that region's API URL.\norganization_deactivated APIErrorCodeOrganizationDeactivated  The organization has been deactivated.\norganization_suspended APIErrorCodeOrganizationSuspended  The organization's subscription is suspended.\npermission_denied APIErrorCodePermissionDenied  The authenticated caller lacks the permissions this endpoint requires.\noauth_not_permitted APIErrorCodeOAuthNotPermitted  This endpoint cannot be called with an OAuth token; use an API token.\nrate_limited APIErrorCodeRateLimited  The applicable rate limit was exceeded; see the X-Retry-After header.\nnot_found APIErrorCodeNotFound  The request path does not correspond to an API endpoint.\nmethod_not_allowed APIErrorCodeMethodNotAllowed  The endpoint does not support this HTTP method.\npayload_too_large APIErrorCodePayloadTooLarge  The request body exceeds the maximum accepted size.\ninvalid_request_body APIErrorCodeInvalidRequestBody  The request body could not be read or parsed.\ninternal_error APIErrorCodeInternalError  An unexpected error occurred; retry or contact support with the request_id.\ninvalid_webhook_credentials APIErrorCodeInvalidWebhookCredentials  The inbound webhook credentials were rejected.\norganization_inactive APIErrorCodeOrganizationInactive  The organization is inactive.",
+            "x-go-enum-desc": "recipients_suppressed APIErrorCodeRecipientsSuppressed  Every To recipient of the outbound email is on the organization's suppression list.\nemail_bounced APIErrorCodeEmailBounced  The email provider rejected a recipient as inactive. Inactive covers a hard  bounce, a spam complaint, or a manual suppression at the provider.\ninternal_issue_reply_not_allowed APIErrorCodeInternalIssueReplyNotAllowed  A customer-facing reply was attempted on an internal issue.\nduplicate_object APIErrorCodeDuplicateObject  The object already exists; its ID is returned in exists_id.\ninvalid_authorization_header APIErrorCodeInvalidAuthorizationHeader  The Authorization header is missing or does not use the Bearer scheme.\ninvalid_api_token APIErrorCodeInvalidAPIToken  The API token was rejected. Covers every reason a token is not accepted.\ninvalid_oauth_token APIErrorCodeInvalidOAuthToken  The OAuth token was rejected.\nwrong_region_token APIErrorCodeWrongRegionToken  The token belongs to another region; use that region's API URL.\norganization_deactivated APIErrorCodeOrganizationDeactivated  The organization has been deactivated.\norganization_suspended APIErrorCodeOrganizationSuspended  The organization's subscription is suspended.\npermission_denied APIErrorCodePermissionDenied  The authenticated caller lacks the permissions this endpoint requires.\noauth_not_permitted APIErrorCodeOAuthNotPermitted  This endpoint cannot be called with an OAuth token; use an API token.\nrate_limited APIErrorCodeRateLimited  The applicable rate limit was exceeded; see the X-Retry-After header.\nnot_found APIErrorCodeNotFound  The request path does not correspond to an API endpoint.\nmethod_not_allowed APIErrorCodeMethodNotAllowed  The endpoint does not support this HTTP method.\npayload_too_large APIErrorCodePayloadTooLarge  The request body exceeds the maximum accepted size.\ninvalid_request_body APIErrorCodeInvalidRequestBody  The request body could not be read or parsed.\ninternal_error APIErrorCodeInternalError  An unexpected error occurred; retry or contact support with the request_id.\ninvalid_webhook_credentials APIErrorCodeInvalidWebhookCredentials  The inbound webhook credentials were rejected.\norganization_inactive APIErrorCodeOrganizationInactive  The organization is inactive.\ninvalid_filter APIErrorCodeInvalidFilter  The request's filter is invalid; filter_errors lists each problem.",
             "x-go-name": "Code"
           },
           "errors": {
@@ -6235,6 +6498,14 @@
             "description": "The ID of the object that already exists if this is a duplicate object error.",
             "type": "string",
             "x-go-name": "ExistsID"
+          },
+          "filter_errors": {
+            "description": "One entry per problem found in the request's filter. Present only when code is\n\"invalid_filter\"; errors carries the same messages as plain text.",
+            "items": {
+              "$ref": "#/components/schemas/FilterError"
+            },
+            "type": "array",
+            "x-go-name": "FilterErrors"
           },
           "request_id": {
             "description": "The request ID for tracking.",
@@ -6572,12 +6843,12 @@
       "Filter": {
         "properties": {
           "field": {
-            "description": "The field for this filter.  For allowed fields, see the documentation for\nthe specific endpoint you are using.\nFor non-compound filters (any operators other than \"and\" or \"or\"),\nfield must be set, along with either value or values, depending on the operator.",
+            "description": "The field for this filter.  For allowed fields, see the documentation for\nthe specific endpoint you are using.\nFor non-compound filters (any operators other than \"and\", \"or\", or \"not\"),\nfield must be set, along with either value or values, depending on the operator.",
             "type": "string",
             "x-go-name": "Field"
           },
           "operator": {
-            "description": "The operator for this filter.",
+            "description": "The operator for this filter. Required unless related_object is set.",
             "enum": [
               "equals",
               "not_equals",
@@ -6587,6 +6858,7 @@
               "not_in",
               "and",
               "or",
+              "not",
               "time_is_after",
               "time_is_before",
               "time_range",
@@ -6600,11 +6872,19 @@
               "less_than_or_equals",
               "includes_all_of",
               "starts_with",
-              "ends_with"
+              "ends_with",
+              "time_is_in_last",
+              "time_is_not_in_last",
+              "time_is_in_next",
+              "time_is_not_in_next",
+              "includes_exactly",
+              "belongs_to",
+              "not_belongs_to"
             ],
             "type": "string",
             "x-enumDescriptions": {
               "and": "Matches objects only if all subfilters match.",
+              "belongs_to": "For a field that holds a user ID, matches objects whose user is a member of any of the teams in the values array, including their subteams. Values are team IDs.",
               "contains": "For a multi-valued field, such as tags, this operator will match objects that contain any of the values in the field.",
               "does_not_contain": "For a multi-valued field, such as tags, this operator will match objects that do not contain any of the values in the field.",
               "ends_with": "Matches objects if the field ends with the given string.",
@@ -6613,10 +6893,13 @@
               "greater_than_or_equals": "Matches objects if the numeric field is greater than or equal to the given value.",
               "in": "Matches objects if the field is one of several possible values, as specified in the values array.",
               "includes_all_of": "For a multi-valued field, matches objects that contain every value in the values array.",
+              "includes_exactly": "For a multi-valued field, matches objects whose values are exactly the values array, in any order.",
               "is_set": "Matches objects if the field is set.",
               "is_unset": "Matches objects if the field is unset.",
               "less_than": "Matches objects if the numeric field is less than the given value.",
               "less_than_or_equals": "Matches objects if the numeric field is less than or equal to the given value.",
+              "not": "Matches objects that do not match the single subfilter. Supported only by issue search.",
+              "not_belongs_to": "For a field that holds a user ID, matches objects whose user is a member of none of the teams in the values array, including their subteams, and objects with no user. Values are team IDs.",
               "not_equals": "Matches objects that are not exactly equal to the value in the field.",
               "not_in": "Matches objects if the field is none of several possible values, as specified in the values array.",
               "or": "Matches objects if any subfilter matches.",
@@ -6625,13 +6908,20 @@
               "string_does_not_contain": "Matches objects if the field does not contain the given string.",
               "time_is_after": "Matches objects if the field is strictly after the given time.",
               "time_is_before": "Matches objects if the field is strictly before the given time.",
+              "time_is_in_last": "Matches objects if the field falls between the start of the window and now. Set value to \"<N>,<unit>\", where unit is milliseconds, seconds, days, or months. Days and months are calendar-aligned: \"7,days\" starts at midnight seven days ago. They use UTC unless a third part names an IANA time zone, such as \"7,days,America/New_York\".",
+              "time_is_in_next": "Matches objects if the field falls after now and no later than the end of the window. The value uses the same format as time_is_in_last.",
+              "time_is_not_in_last": "Matches objects if the field is set and before the window that time_is_in_last would match.",
+              "time_is_not_in_next": "Matches objects if the field is set and outside the window that time_is_in_next would match.",
               "time_range": "Matches objects if the field is between the given times. Set values to [start, end]; both bounds are inclusive."
             },
-            "x-go-enum-desc": "equals FilterOperatorEquals  Matches objects that are exactly equal to the value in the field.\nnot_equals FilterOperatorNotEquals  Matches objects that are not exactly equal to the value in the field.\ncontains FilterOperatorContains  For a multi-valued field, such as tags, this operator will match  objects that contain any of the values in the field.\ndoes_not_contain FilterOperatorDoesNotContain  For a multi-valued field, such as tags, this operator will match  objects that do not contain any of the values in the field.\nin FilterOperatorIn  Matches objects if the field is one of several possible values,  as specified in the values array.\nnot_in FilterOperatorNotIn  Matches objects if the field is none of several possible values,  as specified in the values array.\nand FilterOperatorAnd  Matches objects only if all subfilters match.\nor FilterOperatorOr  Matches objects if any subfilter matches.\ntime_is_after FilterOperatorTimeIsAfter  Matches objects if the field is strictly after the given time.\ntime_is_before FilterOperatorTimeIsBefore  Matches objects if the field is strictly before the given time.\ntime_range FilterOperatorTimeRange  Matches objects if the field is between the given times. Set values to [start, end]; both bounds are inclusive.\nstring_contains FilterOperatorStringContains  Matches objects if the field contains the given string.\nstring_does_not_contain FilterOperatorStringDoesNotContain  Matches objects if the field does not contain the given string.\nis_set FilterOperatorIsSet  FilterOperatorIsSet matches objects if the field is set.\nis_unset FilterOperatorIsUnset  FilterOperatorIsUnset matches objects if the field is unset.\ngreater_than FilterOperatorGreaterThan  Matches objects if the numeric field is greater than the given value.\nless_than FilterOperatorLessThan  Matches objects if the numeric field is less than the given value.\ngreater_than_or_equals FilterOperatorGreaterThanOrEquals  Matches objects if the numeric field is greater than or equal to the given value.\nless_than_or_equals FilterOperatorLessThanOrEquals  Matches objects if the numeric field is less than or equal to the given value.\nincludes_all_of FilterOperatorIncludesAllOf  For a multi-valued field, matches objects that contain every value in the values array.\nstarts_with FilterOperatorStartsWith  Matches objects if the field starts with the given string.\nends_with FilterOperatorEndsWith  Matches objects if the field ends with the given string.",
+            "x-go-enum-desc": "equals FilterOperatorEquals  Matches objects that are exactly equal to the value in the field.\nnot_equals FilterOperatorNotEquals  Matches objects that are not exactly equal to the value in the field.\ncontains FilterOperatorContains  For a multi-valued field, such as tags, this operator will match  objects that contain any of the values in the field.\ndoes_not_contain FilterOperatorDoesNotContain  For a multi-valued field, such as tags, this operator will match  objects that do not contain any of the values in the field.\nin FilterOperatorIn  Matches objects if the field is one of several possible values,  as specified in the values array.\nnot_in FilterOperatorNotIn  Matches objects if the field is none of several possible values,  as specified in the values array.\nand FilterOperatorAnd  Matches objects only if all subfilters match.\nor FilterOperatorOr  Matches objects if any subfilter matches.\nnot FilterOperatorNot  Matches objects that do not match the single subfilter. Supported only by issue search.\ntime_is_after FilterOperatorTimeIsAfter  Matches objects if the field is strictly after the given time.\ntime_is_before FilterOperatorTimeIsBefore  Matches objects if the field is strictly before the given time.\ntime_range FilterOperatorTimeRange  Matches objects if the field is between the given times. Set values to [start, end]; both bounds are inclusive.\nstring_contains FilterOperatorStringContains  Matches objects if the field contains the given string.\nstring_does_not_contain FilterOperatorStringDoesNotContain  Matches objects if the field does not contain the given string.\nis_set FilterOperatorIsSet  FilterOperatorIsSet matches objects if the field is set.\nis_unset FilterOperatorIsUnset  FilterOperatorIsUnset matches objects if the field is unset.\ngreater_than FilterOperatorGreaterThan  Matches objects if the numeric field is greater than the given value.\nless_than FilterOperatorLessThan  Matches objects if the numeric field is less than the given value.\ngreater_than_or_equals FilterOperatorGreaterThanOrEquals  Matches objects if the numeric field is greater than or equal to the given value.\nless_than_or_equals FilterOperatorLessThanOrEquals  Matches objects if the numeric field is less than or equal to the given value.\nincludes_all_of FilterOperatorIncludesAllOf  For a multi-valued field, matches objects that contain every value in the values array.\nstarts_with FilterOperatorStartsWith  Matches objects if the field starts with the given string.\nends_with FilterOperatorEndsWith  Matches objects if the field ends with the given string.\ntime_is_in_last FilterOperatorTimeIsInLast  Matches objects if the field falls between the start of the window and now. Set value to  \"<N>,<unit>\", where unit is milliseconds, seconds, days, or months. Days and months are  calendar-aligned: \"7,days\" starts at midnight seven days ago. They use UTC unless a third  part names an IANA time zone, such as \"7,days,America/New_York\".\ntime_is_not_in_last FilterOperatorTimeIsNotInLast  Matches objects if the field is set and before the window that time_is_in_last would match.\ntime_is_in_next FilterOperatorTimeIsInNext  Matches objects if the field falls after now and no later than the end of the window. The  value uses the same format as time_is_in_last.\ntime_is_not_in_next FilterOperatorTimeIsNotInNext  Matches objects if the field is set and outside the window that time_is_in_next would match.\nincludes_exactly FilterOperatorIncludesExactly  For a multi-valued field, matches objects whose values are exactly the values array, in any order.\nbelongs_to FilterOperatorBelongsTo  For a field that holds a user ID, matches objects whose user is a member of any of the teams  in the values array, including their subteams. Values are team IDs.\nnot_belongs_to FilterOperatorNotBelongsTo  For a field that holds a user ID, matches objects whose user is a member of none of the teams  in the values array, including their subteams, and objects with no user. Values are team IDs.",
             "x-go-name": "Operator"
           },
+          "related_object": {
+            "$ref": "#/components/schemas/FilterRelatedObject"
+          },
           "subfilters": {
-            "description": "Sub-filters for this filter.  Valid only when operator is \"and\" or \"or\".\nThe maximum allowed depth for a tree of filters is 3, counting the top-level filter.",
+            "description": "Sub-filters for this filter.  Valid only when operator is \"and\", \"or\", or \"not\"; \"not\"\ntakes exactly one subfilter.\nThe maximum allowed depth for a tree of filters is 5, counting the top-level filter.",
             "example": [
               {
                 "field": "state",
@@ -6646,12 +6936,12 @@
             "x-go-name": "Subfilters"
           },
           "value": {
-            "description": "The value for this filter. Used by single-valued operators: \"equals\", \"not_equals\",\n\"contains\", \"does_not_contain\", \"string_contains\", \"string_does_not_contain\",\n\"starts_with\", \"ends_with\", \"time_is_after\", \"time_is_before\", \"greater_than\",\n\"less_than\", \"greater_than_or_equals\", and \"less_than_or_equals\".",
+            "description": "The value for this filter. Used by single-valued operators: \"equals\", \"not_equals\",\n\"contains\", \"does_not_contain\", \"string_contains\", \"string_does_not_contain\",\n\"starts_with\", \"ends_with\", \"time_is_after\", \"time_is_before\", \"time_is_in_last\",\n\"time_is_not_in_last\", \"time_is_in_next\", \"time_is_not_in_next\", \"greater_than\",\n\"less_than\", \"greater_than_or_equals\", and \"less_than_or_equals\".\nOn fields that hold user IDs, \"current_user\" means the API token's user; on fields that\nhold team IDs, \"my_teams\" means that user's teams. The same applies to values.",
             "type": "string",
             "x-go-name": "Value"
           },
           "values": {
-            "description": "The values for this filter. Used by multi-valued operators: \"in\", \"not_in\", and\n\"includes_all_of\". For \"time_range\", set to [start, end].",
+            "description": "The values for this filter. Used by multi-valued operators: \"in\", \"not_in\", \"includes_all_of\",\n\"includes_exactly\", \"belongs_to\", and \"not_belongs_to\". For \"time_range\", set to [start, end].",
             "items": {
               "type": "string"
             },
@@ -6659,8 +6949,101 @@
             "x-go-name": "Values"
           }
         },
+        "type": "object",
+        "x-go-package": "pylon/api/apiserver/apitypes"
+      },
+      "FilterError": {
+        "properties": {
+          "allowed": {
+            "description": "What is accepted in place of the rejected field, operator, value, or relationship.\nLong lists are cut off after 100 entries.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "x-go-name": "Allowed"
+          },
+          "code": {
+            "description": "A stable machine-readable identifier for this problem.\n\nKnown values: `invalid_shape`, `too_deep`, `unknown_operator`, `unknown_field`, `operator_not_allowed`, `missing_value`, `unexpected_value`, `invalid_value`, `unknown_relationship`, `unsupported`. This list is not exhaustive.",
+            "type": "string",
+            "x-enumDescriptions": {
+              "invalid_shape": "The filter combines keys that don't belong together, or is missing a required key.",
+              "invalid_value": "The value isn't one the field accepts.",
+              "missing_value": "The operator needs value or values and it wasn't set.",
+              "operator_not_allowed": "The operator exists but the field doesn't accept it.",
+              "too_deep": "The filter tree is nested deeper than the maximum depth.",
+              "unexpected_value": "The operator takes value and values was set, or the reverse.",
+              "unknown_field": "The field doesn't exist on the object being filtered.",
+              "unknown_operator": "The operator doesn't exist.",
+              "unknown_relationship": "The relationship doesn't exist on the object being filtered.",
+              "unsupported": "The filter is well-formed but this endpoint can't evaluate it."
+            },
+            "x-extensible-enum": [
+              "invalid_shape",
+              "too_deep",
+              "unknown_operator",
+              "unknown_field",
+              "operator_not_allowed",
+              "missing_value",
+              "unexpected_value",
+              "invalid_value",
+              "unknown_relationship",
+              "unsupported"
+            ],
+            "x-go-enum-desc": "invalid_shape FilterErrorCodeInvalidShape  The filter combines keys that don't belong together, or is missing a required key.\ntoo_deep FilterErrorCodeTooDeep  The filter tree is nested deeper than the maximum depth.\nunknown_operator FilterErrorCodeUnknownOperator  The operator doesn't exist.\nunknown_field FilterErrorCodeUnknownField  The field doesn't exist on the object being filtered.\noperator_not_allowed FilterErrorCodeOperatorNotAllowed  The operator exists but the field doesn't accept it.\nmissing_value FilterErrorCodeMissingValue  The operator needs value or values and it wasn't set.\nunexpected_value FilterErrorCodeUnexpectedValue  The operator takes value and values was set, or the reverse.\ninvalid_value FilterErrorCodeInvalidValue  The value isn't one the field accepts.\nunknown_relationship FilterErrorCodeUnknownRelationship  The relationship doesn't exist on the object being filtered.\nunsupported FilterErrorCodeUnsupported  The filter is well-formed but this endpoint can't evaluate it.",
+            "x-go-name": "Code"
+          },
+          "field": {
+            "description": "The field of the filter at path, when it has one.",
+            "type": "string",
+            "x-go-name": "Field"
+          },
+          "message": {
+            "description": "What is wrong and how to fix it.",
+            "type": "string",
+            "x-go-name": "Message"
+          },
+          "operator": {
+            "description": "The operator of the filter at path, when it has one.",
+            "type": "string",
+            "x-go-name": "Operator"
+          },
+          "path": {
+            "description": "Where the problem is, as a JSONPath from the root of the filter, such as\n\"$.subfilters[1].related_object.filter\".",
+            "type": "string",
+            "x-go-name": "Path"
+          },
+          "suggestion": {
+            "description": "The accepted entry closest to the rejected one, when one is close enough.",
+            "type": "string",
+            "x-go-name": "Suggestion"
+          }
+        },
         "required": [
-          "operator"
+          "code",
+          "message",
+          "path"
+        ],
+        "type": "object",
+        "x-go-package": "pylon/api/apiserver/apitypes"
+      },
+      "FilterRelatedObject": {
+        "properties": {
+          "custom_field": {
+            "description": "The slug of a relationship custom field to follow. Returned when reading stored filters,\nsuch as ticket form conditions; search filters don't accept it yet.",
+            "type": "string",
+            "x-go-name": "CustomField"
+          },
+          "filter": {
+            "$ref": "#/components/schemas/Filter"
+          },
+          "relationship": {
+            "description": "The built-in relationship to follow, such as \"account\". Each search endpoint lists the\nrelationships its filter accepts. Exactly one of relationship and custom_field is set.",
+            "type": "string",
+            "x-go-name": "Relationship"
+          }
+        },
+        "required": [
+          "filter"
         ],
         "type": "object",
         "x-go-package": "pylon/api/apiserver/apitypes"
@@ -6689,6 +7072,29 @@
         ],
         "type": "object",
         "x-go-package": "pylon/api/apiserver/apitypes"
+      },
+      "GetAccountFilesResponseBody": {
+        "properties": {
+          "data": {
+            "description": "The data payload of the response.",
+            "items": {
+              "$ref": "#/components/schemas/AccountFile"
+            },
+            "type": "array",
+            "x-go-name": "Data"
+          },
+          "request_id": {
+            "description": "The request ID for tracking.",
+            "type": "string",
+            "x-go-name": "RequestID"
+          }
+        },
+        "required": [
+          "data",
+          "request_id"
+        ],
+        "type": "object",
+        "x-go-package": "pylon/api/apiserver/endpoints"
       },
       "GetAccountNotebookNotesResponseBody": {
         "properties": {
@@ -7551,6 +7957,29 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/Project"
+          },
+          "request_id": {
+            "description": "The request ID for tracking.",
+            "type": "string",
+            "x-go-name": "RequestID"
+          }
+        },
+        "required": [
+          "data",
+          "request_id"
+        ],
+        "type": "object",
+        "x-go-package": "pylon/api/apiserver/endpoints"
+      },
+      "GetRouteRedirectsResponseBody": {
+        "properties": {
+          "data": {
+            "description": "The data payload of the response.",
+            "items": {
+              "$ref": "#/components/schemas/RouteRedirect"
+            },
+            "type": "array",
+            "x-go-name": "Data"
           },
           "request_id": {
             "description": "The request ID for tracking.",
@@ -8555,6 +8984,32 @@
         "type": "object",
         "x-go-package": "pylon/api/apiserver/apitypes"
       },
+      "InviteUserRequestBody": {
+        "properties": {
+          "email": {
+            "description": "The email address to send the invitation to.",
+            "example": "jane@example.com",
+            "type": "string",
+            "x-go-name": "Email"
+          },
+          "name": {
+            "description": "The name of the user to invite.",
+            "type": "string",
+            "x-go-name": "Name"
+          },
+          "role_id": {
+            "description": "The ID of the role to give the user. See GET /user-roles. Defaults to the organization's default role.",
+            "type": "string",
+            "x-go-name": "RoleID"
+          }
+        },
+        "required": [
+          "name",
+          "email"
+        ],
+        "type": "object",
+        "x-go-package": "pylon/api/apiserver/endpoints"
+      },
       "Issue": {
         "properties": {
           "account": {
@@ -8674,6 +9129,11 @@
             "nullable": true,
             "type": "object",
             "x-go-name": "CustomFields"
+          },
+          "customer_portal_title": {
+            "description": "The customer-facing title displayed in the customer portal, separate from the internal issue title.",
+            "type": "string",
+            "x-go-name": "CustomerPortalTitle"
           },
           "customer_portal_visible": {
             "description": "Whether the issue is visible in the customer portal.",
@@ -8927,6 +9387,7 @@
         "required": [
           "body_html",
           "created_at",
+          "customer_portal_title",
           "customer_portal_visible",
           "id",
           "is_issue_group",
@@ -9022,6 +9483,36 @@
             "type": "string",
             "x-go-name": "ChannelID"
           },
+          "delivery_mode": {
+            "description": "The destination for messages in this thread, such as slack, email, or linear. None for Pylon-only threads.\n\nKnown values: `email`, `slack`, `chat_widget`, `customer_portal`, `none`, `microsoft_teams`, `microsoft_teams_chat`, `discord`, `google_chat`, `whatsapp`, `telegram`, `sms`, `linear`, `jira`, `github`, `asana`, `shortcut`, `zendesk`, `salesforce_service`, `intercom`, `freshdesk`, `jira_service_management`, `hubspot_service`. This list is not exhaustive.",
+            "type": "string",
+            "x-extensible-enum": [
+              "email",
+              "slack",
+              "chat_widget",
+              "customer_portal",
+              "none",
+              "microsoft_teams",
+              "microsoft_teams_chat",
+              "discord",
+              "google_chat",
+              "whatsapp",
+              "telegram",
+              "sms",
+              "linear",
+              "jira",
+              "github",
+              "asana",
+              "shortcut",
+              "zendesk",
+              "salesforce_service",
+              "intercom",
+              "freshdesk",
+              "jira_service_management",
+              "hubspot_service"
+            ],
+            "x-go-name": "DeliveryMode"
+          },
           "id": {
             "description": "The ID of the thread.",
             "type": "string",
@@ -9049,6 +9540,7 @@
           }
         },
         "required": [
+          "delivery_mode",
           "id",
           "issue_id",
           "name"
@@ -10451,12 +10943,12 @@
             "x-go-name": "Language"
           },
           "object_id": {
-            "description": "The ID of the object to redirect to.",
+            "description": "The ID of the object to redirect to. Empty when object_type is knowledgebase.",
             "type": "string",
             "x-go-name": "ObjectID"
           },
           "object_type": {
-            "description": "The type of the object to redirect to.",
+            "description": "The type of the object to redirect to: article, collection, or knowledgebase for the knowledge base homepage.",
             "type": "string",
             "x-go-name": "ObjectType"
           }
@@ -10532,6 +11024,15 @@
             "description": "Fuzzy text search. Results are intersected with any provided filter.",
             "type": "string",
             "x-go-name": "SearchText"
+          },
+          "sort": {
+            "description": "The order of results, as a list of sort keys. Only one sort key is supported right now. Omit for the default order. Send the same sort with every page of a cursor.",
+            "items": {
+              "$ref": "#/components/schemas/SearchAccountsSort"
+            },
+            "maxItems": 1,
+            "type": "array",
+            "x-go-name": "Sort"
           }
         },
         "type": "object",
@@ -10559,6 +11060,36 @@
         "required": [
           "data",
           "request_id"
+        ],
+        "type": "object",
+        "x-go-package": "pylon/api/apiserver/endpoints"
+      },
+      "SearchAccountsSort": {
+        "properties": {
+          "field": {
+            "description": "The field to sort by.",
+            "enum": [
+              "name",
+              "created_at",
+              "last_customer_activity_at",
+              "last_vendor_activity_at",
+              "issue_count_last_90_days"
+            ],
+            "type": "string",
+            "x-go-name": "Field"
+          },
+          "order": {
+            "description": "The sort direction. Defaults to desc.",
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "type": "string",
+            "x-go-name": "Order"
+          }
+        },
+        "required": [
+          "field"
         ],
         "type": "object",
         "x-go-package": "pylon/api/apiserver/endpoints"
@@ -10798,6 +11329,15 @@
             "description": "Fuzzy text search. Results are intersected with any provided filter.",
             "type": "string",
             "x-go-name": "SearchText"
+          },
+          "sort": {
+            "description": "The order of results, as a list of sort keys. Only one sort key is supported right now. Omit for the default order. Send the same sort with every page of a cursor.",
+            "items": {
+              "$ref": "#/components/schemas/SearchIssuesSort"
+            },
+            "maxItems": 1,
+            "type": "array",
+            "x-go-name": "Sort"
           }
         },
         "type": "object",
@@ -10823,6 +11363,36 @@
         "required": [
           "data",
           "request_id"
+        ],
+        "type": "object",
+        "x-go-package": "pylon/api/apiserver/endpoints"
+      },
+      "SearchIssuesSort": {
+        "properties": {
+          "field": {
+            "description": "The field to sort by. response_breach_time uses the latest issue-level response SLA (first response, next reply, or follow-up); resolution_breach_time uses the latest issue-level resolution SLA. Issues without a breach time sort last in either direction. Use asc for earliest deadlines first.",
+            "enum": [
+              "created_at",
+              "updated_at",
+              "latest_message_time",
+              "response_breach_time",
+              "resolution_breach_time"
+            ],
+            "type": "string",
+            "x-go-name": "Field"
+          },
+          "order": {
+            "description": "The sort direction. Defaults to desc.",
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "type": "string",
+            "x-go-name": "Order"
+          }
+        },
+        "required": [
+          "field"
         ],
         "type": "object",
         "x-go-package": "pylon/api/apiserver/endpoints"
@@ -11113,6 +11683,24 @@
         },
         "type": "object",
         "x-go-package": "pylon/api/apiserver/apitypes"
+      },
+      "SendCustomerPortalInvitationResponseBody": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CustomerPortalInvitationResult"
+          },
+          "request_id": {
+            "description": "The request ID for tracking.",
+            "type": "string",
+            "x-go-name": "RequestID"
+          }
+        },
+        "required": [
+          "data",
+          "request_id"
+        ],
+        "type": "object",
+        "x-go-package": "pylon/api/apiserver/endpoints"
       },
       "SetFeatureRequestPortalVisibilityRequestBody": {
         "properties": {
@@ -11639,6 +12227,11 @@
             "type": "string",
             "x-go-name": "ID"
           },
+          "link": {
+            "description": "The link to the task in the Pylon app. Requires Pylon app access.",
+            "type": "string",
+            "x-go-name": "Link"
+          },
           "linked_issues": {
             "description": "The Pylon issues linked to the task that the current user can access, if any.",
             "items": {
@@ -11688,6 +12281,7 @@
           "created_at",
           "customer_portal_visible",
           "id",
+          "link",
           "status",
           "title",
           "updated_at"
@@ -12085,6 +12679,11 @@
       },
       "TicketForm": {
         "properties": {
+          "ai_search_enabled": {
+            "description": "Whether the form offers AI search before submission.",
+            "type": "boolean",
+            "x-go-name": "AISearchEnabled"
+          },
           "description_html": {
             "description": "The description of the ticket form in HTML.",
             "type": "string",
@@ -12126,6 +12725,7 @@
           }
         },
         "required": [
+          "ai_search_enabled",
           "description_html",
           "id",
           "is_public",
@@ -12158,13 +12758,18 @@
             "type": "string",
             "x-go-name": "Name"
           },
+          "prefill_key": {
+            "description": "The URL query parameter used to prefill this field on the public form.\nDerived from the form's display label and changes when that label is renamed.",
+            "type": "string",
+            "x-go-name": "PrefillKey"
+          },
           "required": {
             "description": "Indicates whether the field is required when submitting the ticket form.",
             "type": "boolean",
             "x-go-name": "Required"
           },
           "slug": {
-            "description": "The slug of the ticket form layout field.",
+            "description": "The field identifier used for API submissions and visibility conditions.\nFor custom fields, this is the underlying custom-field slug.",
             "type": "string",
             "x-go-name": "Slug"
           },
@@ -12186,6 +12791,7 @@
           "description_html",
           "hidden",
           "name",
+          "prefill_key",
           "required",
           "slug",
           "type"
@@ -12514,12 +13120,24 @@
             "x-go-name": "SubaccountIDs"
           },
           "tags": {
-            "description": "An array of strings to use as tags on this account. If provided, the accounts tags will be updated to the given tags.",
+            "description": "An array of strings to use as tags on this account, applied according to tags_apply_mode. By default the account's tags will be updated to the given tags.",
             "items": {
               "type": "string"
             },
             "type": "array",
             "x-go-name": "Tags"
+          },
+          "tags_apply_mode": {
+            "default": "replace",
+            "description": "The mode for applying tags. Valid values: \"append_only\", \"remove_only\", \"replace\". Defaults to \"replace\".",
+            "enum": [
+              "append_only",
+              "remove_only",
+              "replace"
+            ],
+            "example": "append_only",
+            "type": "string",
+            "x-go-name": "TagsApplyMode"
           }
         },
         "type": "object",
@@ -12678,12 +13296,24 @@
             "x-go-name": "PublishUpdatedBodyHTML"
           },
           "tag_ids": {
-            "description": "IDs of article tags to assign. If provided, replaces all tags currently assigned to the article.",
+            "description": "IDs of article tags to assign, applied according to tags_apply_mode. By default replaces all tags currently assigned to the article.",
             "items": {
               "type": "string"
             },
             "type": "array",
             "x-go-name": "TagIDs"
+          },
+          "tags_apply_mode": {
+            "default": "replace",
+            "description": "The mode for applying tag_ids. Valid values: \"append_only\", \"remove_only\", \"replace\". Defaults to \"replace\".",
+            "enum": [
+              "append_only",
+              "remove_only",
+              "replace"
+            ],
+            "example": "append_only",
+            "type": "string",
+            "x-go-name": "TagsApplyMode"
           },
           "title": {
             "description": "The title of the article. For the default language, applies to the live article immediately.",
@@ -12918,6 +13548,14 @@
       },
       "UpdateCustomFieldRequestBody": {
         "properties": {
+          "add_select_options": {
+            "description": "Options to add without replacing existing options or changing existing labels and AI criteria. Cannot be combined with select_options.",
+            "items": {
+              "$ref": "#/components/schemas/CustomFieldDefinitionSelectOption"
+            },
+            "type": "array",
+            "x-go-name": "AddSelectOptions"
+          },
           "default_value": {
             "description": "The default value for single-valued custom fields.",
             "type": "string",
@@ -12936,10 +13574,31 @@
             "type": "string",
             "x-go-name": "Description"
           },
+          "instructions": {
+            "description": "Field-wide instructions for how AI should populate the field. An empty string clears saved instructions when AI is disabled.",
+            "type": "string",
+            "x-go-name": "Instructions"
+          },
+          "is_ai_enabled": {
+            "description": "Whether AI should populate the field. Omit to preserve the current setting.",
+            "type": "boolean",
+            "x-go-name": "IsAIEnabled"
+          },
           "label": {
             "description": "The label of the custom field.",
             "type": "string",
             "x-go-name": "Label"
+          },
+          "option_descriptions": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "AI selection criteria keyed by exact option slug. Omitted options are preserved; an empty string clears an option's criteria.",
+            "type": "object",
+            "x-go-name": "OptionDescriptions"
+          },
+          "requirement": {
+            "$ref": "#/components/schemas/UpdateCustomFieldRequirement"
           },
           "select_options": {
             "description": "The complete list of options for a select or multiselect custom field. Options missing from the list are deleted and their stored values are cleared asynchronously. Prefer the dedicated select option endpoints, which can rename an option without losing stored values.",
@@ -12953,8 +13612,41 @@
             "description": "The slug of the custom field.",
             "type": "string",
             "x-go-name": "Slug"
+          },
+          "visible_by_default": {
+            "description": "Whether the custom field shows on records in Pylon by default. When false, it shows only where a field visibility condition makes it visible. Omit to keep the current setting.",
+            "type": "boolean",
+            "x-go-name": "VisibleByDefault"
           }
         },
+        "type": "object",
+        "x-go-package": "pylon/api/apiserver/endpoints"
+      },
+      "UpdateCustomFieldRequirement": {
+        "properties": {
+          "filter": {
+            "$ref": "#/components/schemas/Filter"
+          },
+          "filter_unsupported": {
+            "description": "Must be false. A requirement whose conditions can't be expressed as an API filter can't be saved through the API; edit it in the app.",
+            "type": "boolean",
+            "x-go-name": "FilterUnsupported"
+          },
+          "setting": {
+            "description": "When the custom field is required. \"required_for_closed\" requires it when closing an issue (only issues that match filter, when set), and \"required_under_certain_conditions\" requires it on issues that match filter, which is then required. Both are only supported on issue fields, issue and feature request fields can't be changed to \"required\", and filter isn't allowed with the other settings.",
+            "enum": [
+              "not_required",
+              "required",
+              "required_for_closed",
+              "required_under_certain_conditions"
+            ],
+            "type": "string",
+            "x-go-name": "Setting"
+          }
+        },
+        "required": [
+          "setting"
+        ],
         "type": "object",
         "x-go-package": "pylon/api/apiserver/endpoints"
       },
@@ -13167,6 +13859,12 @@
             "type": "array",
             "x-go-name": "CustomFields"
           },
+          "customer_portal_title": {
+            "description": "The customer-facing title displayed in the customer portal, separate from the internal issue title. At most 191 characters. Pass an empty string to clear it. Omit to leave unchanged.",
+            "maxLength": 191,
+            "type": "string",
+            "x-go-name": "CustomerPortalTitle"
+          },
           "customer_portal_visible": {
             "description": "Whether the issue should be visible in the customer portal.",
             "type": "boolean",
@@ -13189,12 +13887,24 @@
             "x-go-name": "State"
           },
           "tags": {
-            "description": "An array of strings to use as tags on this issue. If provided, the issue tags will be updated to be exactly the given tags.",
+            "description": "An array of strings to use as tags on this issue, applied according to tags_apply_mode. By default the issue tags will be updated to be exactly the given tags.",
             "items": {
               "type": "string"
             },
             "type": "array",
             "x-go-name": "Tags"
+          },
+          "tags_apply_mode": {
+            "default": "replace",
+            "description": "The mode for applying tags. Valid values: \"append_only\", \"remove_only\", \"replace\". Defaults to \"replace\".",
+            "enum": [
+              "append_only",
+              "remove_only",
+              "replace"
+            ],
+            "example": "append_only",
+            "type": "string",
+            "x-go-name": "TagsApplyMode"
           },
           "team_id": {
             "description": "The ID of the team this issue should be assigned to. If empty string is passed in, any assigned team will be removed.",
@@ -13995,10 +14705,21 @@
             "type": "string",
             "x-go-name": "ID"
           },
+          "issue_access_policy": {
+            "$ref": "#/components/schemas/UserRoleIssueAccessPolicy"
+          },
           "name": {
             "description": "The name of the role.",
             "type": "string",
             "x-go-name": "Name"
+          },
+          "permissions": {
+            "description": "The actions the role grants. An action with a filter applies only to the objects that match it.",
+            "items": {
+              "$ref": "#/components/schemas/UserRolePermission"
+            },
+            "type": "array",
+            "x-go-name": "Permissions"
           },
           "slug": {
             "description": "The slug of the role.",
@@ -14009,7 +14730,92 @@
         "required": [
           "id",
           "name",
+          "permissions",
           "slug"
+        ],
+        "type": "object",
+        "x-go-package": "pylon/api/apiserver/apitypes"
+      },
+      "UserRoleIssueAccessPolicy": {
+        "properties": {
+          "default_actions": {
+            "description": "The actions granted on an issue that matches no rule.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "x-go-name": "DefaultActions"
+          },
+          "rules": {
+            "description": "Rules checked in order. An issue gets only the actions of the first rule that matches it, even when\nthey are fewer than default_actions.",
+            "items": {
+              "$ref": "#/components/schemas/UserRoleIssueAccessRule"
+            },
+            "type": "array",
+            "x-go-name": "Rules"
+          }
+        },
+        "required": [
+          "default_actions",
+          "rules"
+        ],
+        "type": "object",
+        "x-go-package": "pylon/api/apiserver/apitypes"
+      },
+      "UserRoleIssueAccessRule": {
+        "properties": {
+          "actions": {
+            "description": "The actions granted on issues for which this is the first matching rule.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "x-go-name": "Actions"
+          },
+          "filter": {
+            "$ref": "#/components/schemas/Filter"
+          },
+          "filter_unsupported": {
+            "description": "True when the rule has a filter that the API can't represent, so filter is absent.",
+            "type": "boolean",
+            "x-go-name": "FilterUnsupported"
+          },
+          "id": {
+            "description": "The ID of the rule.",
+            "type": "string",
+            "x-go-name": "ID"
+          }
+        },
+        "required": [
+          "actions",
+          "id"
+        ],
+        "type": "object",
+        "x-go-package": "pylon/api/apiserver/apitypes"
+      },
+      "UserRolePermission": {
+        "properties": {
+          "action": {
+            "description": "The action, for example \"read:issue\".",
+            "type": "string",
+            "x-go-name": "Action"
+          },
+          "field_restrictions_unsupported": {
+            "description": "True when the action also hides or locks fields through restrictions that the API can't represent.",
+            "type": "boolean",
+            "x-go-name": "FieldRestrictionsUnsupported"
+          },
+          "filter": {
+            "$ref": "#/components/schemas/Filter"
+          },
+          "filter_unsupported": {
+            "description": "True when the action is limited by a filter that the API can't represent, so filter is absent.",
+            "type": "boolean",
+            "x-go-name": "FilterUnsupported"
+          }
+        },
+        "required": [
+          "action"
         ],
         "type": "object",
         "x-go-package": "pylon/api/apiserver/apitypes"
@@ -14205,6 +15011,15 @@
             "type": "string",
             "x-go-name": "ID"
           },
+          "participants": {
+            "description": "Everyone who was dialed into the call, one entry per call leg, so a person who is redialed appears again. Empty when the call has no participant records.",
+            "items": {
+              "$ref": "#/components/schemas/VoiceCallParticipant"
+            },
+            "nullable": true,
+            "type": "array",
+            "x-go-name": "Participants"
+          },
           "recordings": {
             "description": "Recordings produced for this call.",
             "items": {
@@ -14225,6 +15040,65 @@
           "from_phone_number",
           "id",
           "to_phone_number"
+        ],
+        "type": "object",
+        "x-go-package": "pylon/api/apiserver/apitypes"
+      },
+      "VoiceCallParticipant": {
+        "properties": {
+          "contact_id": {
+            "description": "The ID of the contact, for a customer.",
+            "type": "string",
+            "x-go-name": "ContactID"
+          },
+          "id": {
+            "description": "The ID of the participant.",
+            "type": "string",
+            "x-go-name": "ID"
+          },
+          "joined_at": {
+            "description": "RFC3339 timestamp of when the participant joined the call.",
+            "format": "date-time",
+            "type": "string",
+            "x-go-name": "JoinedAt"
+          },
+          "left_at": {
+            "description": "RFC3339 timestamp of when the participant left the call.",
+            "format": "date-time",
+            "type": "string",
+            "x-go-name": "LeftAt"
+          },
+          "phone_number": {
+            "description": "The phone number of a customer or external participant.",
+            "type": "string",
+            "x-go-name": "PhoneNumber"
+          },
+          "recording_consent": {
+            "description": "Whether the participant was asked to consent to recording, and their answer: `not_asked`, `granted` or `declined`.",
+            "type": "string",
+            "x-go-name": "RecordingConsent"
+          },
+          "role": {
+            "description": "The participant's role: `customer`, `agent` or `external`.",
+            "type": "string",
+            "x-go-name": "Role"
+          },
+          "status": {
+            "description": "The participant's status: `dialing`, `joined`, `left`, `failed` or `voicemail`.",
+            "type": "string",
+            "x-go-name": "Status"
+          },
+          "user_id": {
+            "description": "The ID of the user, for an agent.",
+            "type": "string",
+            "x-go-name": "UserID"
+          }
+        },
+        "required": [
+          "id",
+          "recording_consent",
+          "role",
+          "status"
         ],
         "type": "object",
         "x-go-package": "pylon/api/apiserver/apitypes"
@@ -14503,7 +15377,7 @@
     },
     "/accounts/search": {
       "post": {
-        "description": "Optionally pass `search_text` for fuzzy matching. Results are intersected with any provided filter.\n\nFilterable fields and their allowed operators:\n\n Field | Allowed operators |\n --- | --- |\n `id` | `equals`, `in`, `not_in` |\n `domains` | `contains`, `does_not_contain`, `in`, `not_in` |\n `tags` | `contains`, `does_not_contain`, `in`, `not_in` |\n `name` | `equals`, `in`, `not_in`, `string_contains` |\n `external_ids` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `owner_id` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n\nFor custom fields, pass the field slug as `field`.\n\n**Rate limit:** 120 requests per minute",
+        "description": "Optionally pass `search_text` for fuzzy matching. Results are intersected with any provided filter.\n\nFilterable fields and their allowed operators:\n\n Field | Allowed operators |\n --- | --- |\n `account_id` | `equals`, `in`, `not_in`, `does_not_contain`, `is_set`, `is_unset` |\n `created_at` | `time_is_after`, `time_is_before`, `time_range`, `time_is_in_last`, `time_is_not_in_last` |\n `domains` | `equals`, `contains`, `does_not_contain`, `in`, `not_in`, `string_contains`, `string_does_not_contain` |\n `external_channel_ids` | `equals`, `contains`, `does_not_contain`, `in`, `not_in` |\n `external_channel_type` | `equals`, `in`, `not_in`, `does_not_contain`, `is_set`, `is_unset` |\n `external_ids` | `equals`, `in`, `not_in`, `does_not_contain`, `is_set`, `is_unset` |\n `internal_channel_ids` | `equals`, `contains`, `does_not_contain`, `in`, `not_in` |\n `internal_slack_channel_id` | `equals`, `in`, `not_in`, `does_not_contain`, `string_contains`, `string_does_not_contain` |\n `internal_slack_channel_name` | `equals`, `in`, `not_in`, `does_not_contain`, `string_contains`, `string_does_not_contain` |\n `issue_count_last_90_days` | `equals` |\n `last_broadcast_sent_at` | `time_is_after`, `time_is_before`, `time_range`, `time_is_in_last`, `time_is_not_in_last` |\n `last_customer_activity_at` | `time_is_after`, `time_is_before`, `time_range`, `time_is_in_last`, `time_is_not_in_last` |\n `last_vendor_activity_at` | `time_is_after`, `time_is_before`, `time_range`, `time_is_in_last`, `time_is_not_in_last` |\n `name` | `equals`, `in`, `not_in`, `string_contains`, `contains`, `does_not_contain` |\n `number_of_users_in_channel` | `equals` |\n `owner_id` | `equals`, `in`, `not_in`, `is_set`, `is_unset`, `belongs_to`, `not_belongs_to`, `does_not_contain` |\n `parent_account_id` | `equals`, `in`, `not_in`, `does_not_contain`, `is_set`, `is_unset` |\n `partner_account_id` | `equals`, `in`, `not_in`, `does_not_contain`, `is_set`, `is_unset` |\n `primary_channel_id` | `equals`, `in`, `not_in`, `does_not_contain` |\n `primary_domain` | `equals`, `contains`, `does_not_contain`, `in`, `not_in`, `string_contains`, `string_does_not_contain`, `is_set`, `is_unset` |\n `slack_channel_id` | `equals`, `in`, `not_in`, `does_not_contain`, `string_contains`, `string_does_not_contain` |\n `slack_channel_name` | `equals`, `in`, `not_in`, `does_not_contain`, `string_contains`, `string_does_not_contain` |\n `source` | `equals`, `in`, `not_in`, `does_not_contain` |\n `state` | `equals`, `in`, `not_in`, `does_not_contain` |\n `tags` | `equals`, `contains`, `does_not_contain`, `in`, `not_in` |\n `type` | `equals`, `in`, `not_in`, `does_not_contain` |\n\n### Filter syntax and operators\n\nSee [Search filters](https://docs.usepylon.com/pylon-docs/developer/api/conventions#search-filters) for filter structure and operator definitions. The table above lists the operators supported by each field.\n\n### Filter values\n\nTimestamp values use RFC 3339 format, such as `2026-10-01T00:00:00Z`.\n\n Field | Values and behavior |\n --- | --- |\n `state` | `enabled` or `disabled`. |\n `name` | `contains` is an alias for `string_contains`. |\n `account_id` | `id` is also accepted as a field name. |\n `tags` | A tag name or ID. |\n\n### Custom fields\n\nSet `field` to the custom field's slug. If a custom field has the same slug as a built-in field, the custom field is matched instead, except for these fields:\n\n`account_id`\n`domains`\n`tags`\n`name`\n`external_ids`\n`owner_id`\n\n**Rate limit:** 120 requests per minute",
         "operationId": "SearchAccounts",
         "requestBody": {
           "content": {
@@ -15501,6 +16375,52 @@
       }
     },
     "/accounts/{id}/files": {
+      "get": {
+        "description": "Returns the files uploaded to an account, newest first, by account ID or external ID.\n\n**Rate limit:** 300 requests per minute",
+        "operationId": "GetAccountFiles",
+        "parameters": [
+          {
+            "description": "The ID or external ID of the account.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-fern-parameter-name": "account_id",
+            "x-go-name": "ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetAccountFilesResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedApiResponse"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenApiResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/ErrorApiResponse"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequestsApiResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerErrorApiResponse"
+          }
+        },
+        "summary": "Get an account's files",
+        "tags": [
+          "accounts"
+        ],
+        "x-fern-request-name": "AccountsListFilesRequest",
+        "x-fern-sdk-group-name": [
+          "accounts"
+        ],
+        "x-fern-sdk-method-name": "list-files"
+      },
       "post": {
         "description": "Uploads one or more files to an account by ID or external ID.\n\n**Rate limit:** 30 requests per minute",
         "operationId": "UploadAccountFile",
@@ -15832,7 +16752,7 @@
     },
     "/audit-logs/search": {
       "post": {
-        "description": "Returns a filtered, paginated list of audit log entries for the organization.\nFilterable fields and their allowed operators:\n\n Field | Allowed operators |\n --- | --- |\n `action` | `equals`, `in`, `not_in`, `string_contains`, `string_does_not_contain` |\n `action_happened_at` | `time_is_after`, `time_is_before`, `time_range` |\n `object_id` | `equals`, `in`, `not_in` |\n\nTimestamp values use RFC3339 format. `object_id` is the ID of the object the entry is\nfor, matching the `object_id` field of the returned entries.\n\n**Rate limit:** 30 requests per minute",
+        "description": "Returns a filtered, paginated list of audit log entries for the organization.\nFilterable fields and their allowed operators:\n\n Field | Allowed operators |\n --- | --- |\n `action` | `equals`, `in`, `not_in`, `string_contains`, `string_does_not_contain` |\n `action_happened_at` | `time_is_after`, `time_is_before`, `time_range` |\n `object_id` | `equals`, `in`, `not_in` |\n\n### Filter syntax and operators\n\nSee [Search filters](https://docs.usepylon.com/pylon-docs/developer/api/conventions#search-filters) for filter structure and operator definitions. The table above lists the operators supported by each field.\n\n### Filter values\n\nTimestamp values use RFC 3339 format, such as `2026-10-01T00:00:00Z`.\n\n Field | Values and behavior |\n --- | --- |\n `object_id` | The ID of the object the entry is for, matching `object_id` in the returned entries. |\n\n**Rate limit:** 30 requests per minute",
         "operationId": "SearchAuditLogs",
         "requestBody": {
           "content": {
@@ -15936,7 +16856,7 @@
     },
     "/call-recordings/search": {
       "post": {
-        "description": "Filterable fields and their allowed operators:\n\n Field | Allowed operators |\n --- | --- |\n `account_id` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `source` | `equals`, `in`, `not_in` |\n `title` | `equals`, `string_contains` |\n `start_time` | `time_is_after`, `time_is_before`, `time_range` |\n\nTimestamp values use RFC3339 format.\n\n**Rate limit:** 120 requests per minute",
+        "description": "Filterable fields and their allowed operators:\n\n Field | Allowed operators |\n --- | --- |\n `account_id` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `source` | `equals`, `in`, `not_in` |\n `title` | `equals`, `string_contains` |\n `start_time` | `time_is_after`, `time_is_before`, `time_range` |\n\n### Filter syntax and operators\n\nSee [Search filters](https://docs.usepylon.com/pylon-docs/developer/api/conventions#search-filters) for filter structure and operator definitions. The table above lists the operators supported by each field.\n\n### Timestamp values\n\nTimestamp values use RFC 3339 format, such as `2026-10-01T00:00:00Z`.\n\n**Rate limit:** 120 requests per minute",
         "operationId": "SearchCallRecordings",
         "requestBody": {
           "content": {
@@ -16306,7 +17226,7 @@
     },
     "/contacts/search": {
       "post": {
-        "description": "Filterable fields and their allowed operators:\n\n Field | Allowed operators |\n --- | --- |\n `id` | `equals`, `in`, `not_in` |\n `email` | `equals`, `in`, `not_in`, `string_contains` |\n `name` | `equals`, `in`, `not_in`, `string_contains` |\n `account_id` | `equals`, `in`, `not_in` |\n\nFor custom fields, pass the field slug as `field`.\n\n**Rate limit:** 120 requests per minute",
+        "description": "Filterable fields and their allowed operators:\n\n Field | Allowed operators |\n --- | --- |\n `id` | `equals`, `in`, `not_in` |\n `email` | `equals`, `in`, `not_in`, `string_contains`, `string_does_not_contain` |\n `name` | `equals`, `in`, `not_in`, `string_contains`, `string_does_not_contain` |\n `account_id` | `equals`, `in`, `not_in` |\n\n### Filter syntax and operators\n\nSee [Search filters](https://docs.usepylon.com/pylon-docs/developer/api/conventions#search-filters) for filter structure and operator definitions. The table above lists the operators supported by each field.\n\n### Custom fields\n\nSet `field` to the custom field's slug.\n\n**Rate limit:** 120 requests per minute",
         "operationId": "SearchContacts",
         "requestBody": {
           "content": {
@@ -16507,13 +17427,67 @@
         "x-fern-sdk-method-name": "update"
       }
     },
+    "/contacts/{id}/portal-invitation": {
+      "post": {
+        "description": "Sends or resends a portal invitation to the contact's primary email. The portal must be enabled and the contact must already have portal access. Does not change the contact's role. Requires customer portal settings write permission and write access to the contact's primary account, if any. Each successful call requests another invitation; success does not guarantee email delivery.\n\n**Rate limit:** 30 requests per minute",
+        "operationId": "SendCustomerPortalInvitation",
+        "parameters": [
+          {
+            "description": "The ID of the contact to invite.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-fern-parameter-name": "contact_id",
+            "x-go-name": "ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SendCustomerPortalInvitationResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestApiResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedApiResponse"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenApiResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/ErrorApiResponse"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequestsApiResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerErrorApiResponse"
+          }
+        },
+        "summary": "Send a customer portal invitation",
+        "tags": [
+          "contacts"
+        ],
+        "x-fern-request-name": "ContactsPortalInvitationRequest",
+        "x-fern-retries": {
+          "disabled": true
+        },
+        "x-fern-sdk-group-name": [
+          "contacts"
+        ],
+        "x-fern-sdk-method-name": "portal-invitation"
+      }
+    },
     "/custom-fields": {
       "get": {
         "description": "Returns all custom field definitions for the specified object type. Use `slug` (and `select_metadata.options[].slug` for option values) in API writes and filters.\n\n**Rate limit:** 300 requests per minute",
         "operationId": "GetCustomFields",
         "parameters": [
           {
-            "description": "The object type of the custom fields. Can be \"account\", \"issue\", \"contact\", \"task\", \"project\", \"meeting\", or \"opportunity\".",
+            "description": "The object type of the custom fields. Can be \"account\", \"issue\", \"contact\", \"task\", \"project\", \"meeting\", \"opportunity\", or \"feature_request\".",
             "in": "query",
             "name": "object_type",
             "required": true,
@@ -16525,7 +17499,8 @@
                 "task",
                 "project",
                 "meeting",
-                "opportunity"
+                "opportunity",
+                "feature_request"
               ],
               "type": "string"
             },
@@ -17113,7 +18088,7 @@
     },
     "/custom-objects/{type}/search": {
       "post": {
-        "description": "Filterable fields and their allowed operators:\n\n Field | Allowed operators |\n --- | --- |\n `name` | `equals`, `in`, `not_in`, `string_contains`, `string_does_not_contain`, `is_set`, `is_unset` |\n `account` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `created_at` | `time_is_after`, `time_is_before`, `time_range` |\n `updated_at` | `time_is_after`, `time_is_before`, `time_range` |\n\n`account` is the built-in Account relationship field present on every custom object type; its values are account IDs.\nTimestamp values use RFC3339 format. For custom fields, pass the field slug as `field`.\n\nA `{type}` of `opportunity` is an alias for the opportunities API and filters on a different set of fields:\n\n Field | Allowed operators |\n --- | --- |\n `name` | `equals`, `in`, `not_in`, `string_contains` |\n `account_id` | `equals`, `in`, `not_in` |\n `source` | `equals`, `in`, `not_in` |\n `created_at` | `time_is_after`, `time_is_before`, `time_range` |\n\n**Rate limit:** 120 requests per minute",
+        "description": "Filterable fields and their allowed operators:\n\n Field | Allowed operators |\n --- | --- |\n `name` | `equals`, `in`, `not_in`, `string_contains`, `string_does_not_contain`, `is_set`, `is_unset` |\n `account` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `created_at` | `time_is_after`, `time_is_before`, `time_range` |\n `updated_at` | `time_is_after`, `time_is_before`, `time_range` |\n\n### Filter syntax and operators\n\nSee [Search filters](https://docs.usepylon.com/pylon-docs/developer/api/conventions#search-filters) for filter structure and operator definitions. The table above lists the operators supported by each field.\n\n### Filter values\n\nTimestamp values use RFC 3339 format, such as `2026-10-01T00:00:00Z`.\n\n Field | Values and behavior |\n --- | --- |\n `account` | The built-in Account relationship field on every custom object type. Use account IDs as values. |\n\n### Custom fields\n\nSet `field` to the custom field's slug.\n\n### Opportunities\n\nA `{type}` of `opportunity` is an alias for the opportunities API and filters on a different set of fields:\n\n Field | Allowed operators |\n --- | --- |\n `name` | `equals`, `in`, `not_in`, `string_contains` |\n `account_id` | `equals`, `in`, `not_in` |\n `source` | `equals`, `in`, `not_in` |\n `created_at` | `time_is_after`, `time_is_before`, `time_range` |\n\n**Rate limit:** 120 requests per minute",
         "operationId": "SearchCustomObjects",
         "parameters": [
           {
@@ -18544,7 +19519,7 @@
     },
     "/issues/search": {
       "post": {
-        "description": "Filterable fields and their allowed operators:\n\n Field | Allowed operators |\n --- | --- |\n `created_at` | `time_is_after`, `time_is_before`, `time_range` |\n `account_id` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `customer_portal_visible` | `equals`, `in`, `not_in` |\n `ticket_form_id` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `requester_id` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `follower_user_id` | `equals`, `in`, `not_in` |\n `follower_contact_id` | `equals`, `in`, `not_in` |\n `state` | `equals`, `in`, `not_in` |\n `tags` | `contains`, `does_not_contain`, `in`, `not_in` |\n `title` | `string_contains`, `string_does_not_contain` |\n `body_html` | `string_contains`, `string_does_not_contain` |\n `assignee_id` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `team_id` | `equals`, `in`, `not_in` |\n `issue_type` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `issue_is_issue_group` | `equals`, `in`, `not_in` |\n `resolved_at` | `time_is_after`, `time_is_before`, `time_range` |\n `latest_message_activity_at` | `time_is_after`, `time_is_before`, `time_range` |\n `updated_at` | `time_is_after`, `time_is_before`, `time_range` |\n `slack_channel_id` | `equals`, `in`, `not_in` |\n `workspace_email` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `reopened` | `equals`, `in`, `not_in` |\n\nTimestamp values use RFC3339 format. Standard `state` values are `new`, `waiting_on_you`, `waiting_on_customer`, `on_hold`, and `closed`; custom status slugs are also supported. `issue_type` values are `conversation` and `ticket`.\n\nFor tag filters, pass the tag name. For custom fields, pass the field slug as `field`. `slack_channel_id` identifies the Slack channel where the issue was created. `workspace_email` identifies the email address connected to the Pylon workspace through which the issue's email conversation is routed. `customer_portal_visible` values are `true` and `false`; issue groups are never visible in the customer portal, so they always match `false`. `reopened` values are `true` and `false`; it is a sticky flag set the first time an issue is reopened after being resolved, and it records no timestamp.\n\n**Rate limit:** 120 requests per minute",
+        "description": "Filterable fields and their allowed operators:\n\n Field | Allowed operators |\n --- | --- |\n `created_at` | `time_is_after`, `time_is_before`, `time_range` |\n `account_id` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `customer_portal_visible` | `equals`, `in`, `not_in` |\n `ticket_form_id` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `requester_id` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `follower_user_id` | `equals`, `in`, `not_in` |\n `follower_contact_id` | `equals`, `in`, `not_in` |\n `state` | `equals`, `in`, `not_in` |\n `tags` | `contains`, `does_not_contain`, `in`, `not_in`, `includes_exactly` |\n `subject` | `string_contains`, `string_does_not_contain` |\n `body_html` | `string_contains`, `string_does_not_contain` |\n `assignee_id` | `equals`, `in`, `not_in`, `is_set`, `is_unset`, `belongs_to`, `not_belongs_to` |\n `team_id` | `equals`, `in`, `not_in` |\n `issue_type` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `issue_is_issue_group` | `equals`, `in`, `not_in` |\n `resolved_at` | `time_is_after`, `time_is_before`, `time_range` |\n `latest_message_activity_at` | `time_is_after`, `time_is_before`, `time_range` |\n `updated_at` | `time_is_after`, `time_is_before`, `time_range` |\n `slack_channel_id` | `equals`, `in`, `not_in` |\n `workspace_email` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `reopened` | `equals`, `in`, `not_in` |\n `number` | `equals`, `in`, `not_in` |\n `source` | `equals`, `in`, `not_in` |\n `first_response_at` | `time_is_after`, `time_is_before`, `time_range`, `time_is_in_last`, `time_is_not_in_last`, `is_set`, `is_unset` |\n `latest_customer_message_activity_at` | `time_is_after`, `time_is_before`, `time_range`, `time_is_in_last`, `time_is_not_in_last`, `is_set`, `is_unset` |\n `latest_vendor_message_activity_at` | `time_is_after`, `time_is_before`, `time_range`, `time_is_in_last`, `time_is_not_in_last`, `is_set`, `is_unset` |\n `partner_account_id` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `is_snoozed` | `equals`, `in`, `not_in` |\n `requester_email` | the operators of the requester's `email` |\n `parent_issue_group_id` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `number_of_touches` | `equals`, `greater_than`, `greater_than_or_equals`, `less_than`, `less_than_or_equals` |\n `email_subject` | `string_contains`, `string_does_not_contain`, `starts_with`, `ends_with`, `is_set`, `is_unset` |\n `first_message_from` | `equals`, `in`, `not_in`, `is_set` |\n `last_message_from` | `equals`, `in`, `not_in`, `is_set` |\n `latest_public_message_activity_at` | `time_is_after`, `time_is_before`, `time_range`, `time_is_in_last`, `time_is_not_in_last`, `is_set`, `is_unset` |\n `number_of_customer_messages` | `equals`, `greater_than`, `greater_than_or_equals`, `less_than`, `less_than_or_equals`, `is_set`, `is_unset` |\n `message_redaction_used` | `equals`, `in`, `not_in` |\n `time_to_first_response` | `greater_than`, `greater_than_or_equals`, `less_than`, `less_than_or_equals`, `is_set` |\n `from_email` | `equals`, `in`, `not_in`, `string_contains`, `string_does_not_contain`, `starts_with`, `ends_with`, `is_set` |\n `cc_email` | `equals`, `in`, `not_in`, `string_contains`, `string_does_not_contain`, `starts_with`, `ends_with`, `is_set`, `is_unset` |\n `ccs` | `equals`, `in`, `not_in`, `string_contains`, `string_does_not_contain`, `starts_with`, `ends_with`, `is_set`, `is_unset` |\n `asana_product_issue` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `github_product_issue` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `jira_product_issue` | `equals`, `in`, `not_in`, `string_contains`, `starts_with`, `ends_with`, `is_set`, `is_unset` |\n `linear_product_issue` | `equals`, `in`, `not_in`, `string_contains`, `starts_with`, `is_set`, `is_unset` |\n `shortcut_product_issue` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `product_issue_source` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `product_ticket_completion` | `equals` |\n `number_of_child_issues` | `equals`, `greater_than`, `greater_than_or_equals`, `less_than`, `less_than_or_equals`, `is_set`, `is_unset` |\n `created_in_channel_id` | `equals`, `in`, `not_in`, `string_contains`, `starts_with`, `ends_with`, `is_set`, `is_unset` |\n `product_area` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n\n### Filter syntax and operators\n\nSee [Search filters](https://docs.usepylon.com/pylon-docs/developer/api/conventions#search-filters) for filter structure, combining conditions, related objects, and operator definitions. The table above lists the operators supported by each issue field.\n\n### Status and issue properties\n\nStandard `state` values:\n\n`new`\n`waiting_on_you`\n`waiting_on_customer`\n`on_hold`\n`closed`\n\nCustom status slugs are also supported.\n\n Field | Values and behavior |\n --- | --- |\n `issue_type` | `conversation` or `ticket`. |\n `is_snoozed` | `true` or `false`. |\n `customer_portal_visible` | `true` or `false`. Issue groups always match `false`. |\n `reopened` | `true` or `false`. Set the first time an issue is reopened after being resolved; stays set and records no timestamp. |\n `parent_issue_group_id` | The ID of the issue group the issue belongs to. |\n `product_area` | A product area slug, such as `billing`. |\n `tags` | A tag name or ID. |\n\n### Messages, timestamps, and counts\n\nTimestamp values use RFC 3339 format, such as `2026-10-01T00:00:00Z`.\n\n Field | Values and behavior |\n --- | --- |\n `subject` | The issue title. `title` is also accepted as a field name. |\n `subject`, `body_html` | `contains` and `does_not_contain` are aliases for `string_contains` and `string_does_not_contain`. |\n `latest_vendor_message_activity_at` | The timestamp of the latest message from your team. |\n `latest_customer_message_activity_at` | The timestamp of the latest message from the customer. |\n `first_message_from`, `last_message_from` | `customer`, `vendor`, or a team ID to match messages from that team's members. For example, `\"value\": \"customer\"`. |\n `time_to_first_response` | Seconds by default. Use `\"value\": \"3600\"` with `greater_than` for over an hour. `\"<N>,seconds\"` and `\"<N>,milliseconds\"` are also accepted. |\n `number_of_touches` | The issue's `number_of_touches` value. |\n `number_of_customer_messages`, `number_of_child_issues` | Whole numbers. |\n `message_redaction_used` | `true` or `false`. |\n\n### Sources, channels, and email\n\n Field | Values and behavior |\n --- | --- |\n `source` | The issue's source, such as `slack`, `email`, `chat_widget`, or `manual`. Issues created with a `custom_issue_source_id` match that custom source's slug. |\n `slack_channel_id` | The Slack channel ID where the issue was created. |\n `workspace_email` | The email address connected to the Pylon workspace through which the issue's email conversation is routed. |\n `requester_email` | Shorthand for a `related_object` filter on the requester's `email`. |\n `ccs` | The CC addresses on the issue's latest email. |\n `cc_email` | The CC recipients recorded on the issue. |\n\nFor `from_email`, `ccs`, and `cc_email`, use an address such as `jane@acme.com`, or `string_contains` with `@acme.com` to match a domain.\n\n`created_in_channel_id` matches the channel where the issue was created. The value depends on the operator:\n\n Operators | Matches | Example |\n --- | --- | --- |\n `equals`, `in`, `not_in` | Channel ID; for email issues, an email address. | `C0123ABCDEF` or `support@acme.com` |\n `string_contains`, `starts_with`, `ends_with` | Channel name. | `support` |\n\n### Linked engineering tickets\n\nUse the linked ticket's `external_id` from the issue's `external_issues` entry. Each integration uses a different ID format:\n\n Field | ID format | Example |\n --- | --- | --- |\n `linear_product_issue` | Linear issue UUID. | `2f8c1d3e-6b1a-4c55-9e0f-7a2b3c4d5e6f` |\n `jira_product_issue` | Jira issue numeric ID. | `10042` |\n `github_product_issue` | `owner/repo/number`. | `acme/api/123` |\n `shortcut_product_issue` | Story numeric ID. | `1234` |\n `asana_product_issue` | Task numeric ID. | `1204567890123456` |\n\nHuman-readable ticket keys such as `ENG-123`, `PROJ-42`, and `sc-1234` aren't accepted for these filters.\n\n`product_issue_source` accepts:\n\n`asana`\n`github`\n`jira`\n`linear`\n`shortcut`\n\n`product_ticket_completion` accepts `any_done` or `all_done`.\n\n### Custom fields\n\nSet `field` to the custom field's slug. If a custom field has the same slug as one of the built-in fields listed above, the custom field is matched instead.\n\n**Rate limit:** 120 requests per minute",
         "operationId": "SearchIssues",
         "requestBody": {
           "content": {
@@ -19135,7 +20110,7 @@
     },
     "/issues/{id}/messages": {
       "get": {
-        "description": "Returns messages for the specified issue, including replies and internal notes, ordered from oldest to newest.\n\nTo post a reply, use the message's top-level id—not thread_id or email_info.message_id. To post an internal note, use an internal thread's thread_id or an internal note's top-level id. Omit both limit and cursor to return all messages; when cursor is provided without limit, the page size defaults to 100.\n\n**Rate limit:** 120 requests per minute",
+        "description": "Returns messages for the specified issue, including replies and internal notes, ordered from oldest to newest.\n\nSet public_only=true to exclude internal notes and hidden messages and remove internal metadata. This option does not authenticate a customer or apply customer-portal access rules.\n\nTo post a reply, use the message's top-level id—not thread_id or email_info.message_id. To post an internal note, use an internal thread's thread_id or an internal note's top-level id. Omit both limit and cursor to return all messages; when cursor is provided without limit, the page size defaults to 100.\n\n**Rate limit:** 120 requests per minute",
         "operationId": "GetIssueMessages",
         "parameters": [
           {
@@ -19167,6 +20142,15 @@
               "type": "integer"
             },
             "x-go-name": "Limit"
+          },
+          {
+            "description": "Return only customer-visible messages, excluding internal notes and hidden messages. Clears BCC recipients, email-open tracking, Slack metadata, internal thread IDs, and the author's internal user email. Defaults to false. This does not enforce a portal visitor's ticket access or portal identity settings; callers must authorize their customers separately.",
+            "in": "query",
+            "name": "public_only",
+            "schema": {
+              "type": "boolean"
+            },
+            "x-go-name": "PublicOnly"
           }
         ],
         "responses": {
@@ -19830,7 +20814,7 @@
     },
     "/issues/{id}/voice-calls": {
       "get": {
-        "description": "Returns voice call records for the specified phone issue. Each call includes its recordings, with parsed transcript segments and a presigned download URL for the audio file. Recordings whose transcript has not yet completed are omitted; refetch later to see them.\n\n**Rate limit:** 120 requests per minute",
+        "description": "Returns voice call records for the specified phone issue. Each call includes its participants and its recordings, with parsed transcript segments and a presigned download URL for the audio file. Recordings whose transcript has not yet completed are omitted; refetch later to see them.\n\n**Rate limit:** 120 requests per minute",
         "operationId": "GetIssueVoiceCalls",
         "parameters": [
           {
@@ -20714,6 +21698,53 @@
       }
     },
     "/knowledge-bases/{id}/route-redirects": {
+      "get": {
+        "description": "Returns every path redirect in a knowledge base.\n\n**Rate limit:** 300 requests per minute",
+        "operationId": "GetRouteRedirects",
+        "parameters": [
+          {
+            "description": "The ID of the knowledge base.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-fern-parameter-name": "knowledge_base_id",
+            "x-go-name": "ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetRouteRedirectsResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedApiResponse"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenApiResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/ErrorApiResponse"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequestsApiResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerErrorApiResponse"
+          }
+        },
+        "summary": "Get a list of route redirects",
+        "tags": [
+          "route-redirects"
+        ],
+        "x-fern-request-name": "KnowledgeBasesRouteRedirectsListRequest",
+        "x-fern-sdk-group-name": [
+          "knowledge_bases",
+          "route_redirects"
+        ],
+        "x-fern-sdk-method-name": "list"
+      },
       "post": {
         "description": "Creates a path redirect within a knowledge base, mapping a source path to an article or collection.\n\n**Rate limit:** 30 requests per minute",
         "operationId": "CreateRouteRedirect",
@@ -20779,6 +21810,65 @@
           "route_redirects"
         ],
         "x-fern-sdk-method-name": "create"
+      }
+    },
+    "/knowledge-bases/{id}/route-redirects/{redirect_id}": {
+      "delete": {
+        "description": "Deletes a path redirect from a knowledge base. Requires knowledge base admin permission.\n\n**Rate limit:** 30 requests per minute",
+        "operationId": "DeleteRouteRedirect",
+        "parameters": [
+          {
+            "description": "The ID of the knowledge base.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-fern-parameter-name": "knowledge_base_id",
+            "x-go-name": "ID"
+          },
+          {
+            "description": "The ID of the route redirect.",
+            "in": "path",
+            "name": "redirect_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-go-name": "RedirectID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DeleteRouteRedirectResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedApiResponse"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenApiResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/ErrorApiResponse"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequestsApiResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerErrorApiResponse"
+          }
+        },
+        "summary": "Delete a route redirect",
+        "tags": [
+          "route-redirects"
+        ],
+        "x-fern-request-name": "KnowledgeBasesRouteRedirectsDeleteRequest",
+        "x-fern-sdk-group-name": [
+          "knowledge_bases",
+          "route_redirects"
+        ],
+        "x-fern-sdk-method-name": "delete"
       }
     },
     "/knowledge-bases/{id}/themes/{theme_id}": {
@@ -21344,7 +22434,7 @@
     },
     "/milestones/search": {
       "post": {
-        "description": "Filterable fields and their allowed operators:\n\n Field | Allowed operators |\n --- | --- |\n `project_id` | `equals`, `in`, `not_in` |\n `account_id` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `due_date` | `time_is_after`, `time_is_before`, `time_range`, `is_set`, `is_unset` |\n `created_at` | `time_is_after`, `time_is_before`, `time_range` |\n `updated_at` | `time_is_after`, `time_is_before`, `time_range` |\n `started_at` | `time_is_after`, `time_is_before`, `time_range`, `is_set` |\n `completed_at` | `time_is_after`, `time_is_before`, `time_range`, `is_set` |\n\nTimestamp values use RFC3339 format. Milestones belonging to an unlaunched project are not returned.\n\n**Rate limit:** 120 requests per minute",
+        "description": "Filterable fields and their allowed operators:\n\n Field | Allowed operators |\n --- | --- |\n `project_id` | `equals`, `in`, `not_in` |\n `account_id` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `due_date` | `time_is_after`, `time_is_before`, `time_range`, `is_set`, `is_unset` |\n `created_at` | `time_is_after`, `time_is_before`, `time_range` |\n `updated_at` | `time_is_after`, `time_is_before`, `time_range` |\n `started_at` | `time_is_after`, `time_is_before`, `time_range`, `is_set` |\n `completed_at` | `time_is_after`, `time_is_before`, `time_range`, `is_set` |\n\n### Filter syntax and operators\n\nSee [Search filters](https://docs.usepylon.com/pylon-docs/developer/api/conventions#search-filters) for filter structure and operator definitions. The table above lists the operators supported by each field.\n\n### Timestamp values\n\nTimestamp values use RFC 3339 format, such as `2026-10-01T00:00:00Z`.\n\n### Project availability\n\nMilestones belonging to an unlaunched project are not returned.\n\n**Rate limit:** 120 requests per minute",
         "operationId": "SearchMilestones",
         "requestBody": {
           "content": {
@@ -21601,7 +22691,7 @@
     },
     "/projects/search": {
       "post": {
-        "description": "Filterable fields and their allowed operators:\n\n Field | Allowed operators |\n --- | --- |\n `account_id` | `equals`, `in`, `not_in`, `is_set` |\n `status` | `equals`, `in`, `not_in` |\n `owner_id` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `is_archived` | `equals` |\n `created_at` | `time_is_after`, `time_is_before`, `time_range` |\n `updated_at` | `time_is_after`, `time_is_before`, `time_range` |\n\nTimestamp values use RFC3339 format. Valid `status` values are `not_started`, `in_progress`, and `completed`. For custom fields, pass the field slug as `field`.\n\n**Rate limit:** 120 requests per minute",
+        "description": "Filterable fields and their allowed operators:\n\n Field | Allowed operators |\n --- | --- |\n `account_id` | `equals`, `in`, `not_in`, `is_set` |\n `status` | `equals`, `in`, `not_in` |\n `owner_id` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `is_archived` | `equals` |\n `created_at` | `time_is_after`, `time_is_before`, `time_range` |\n `updated_at` | `time_is_after`, `time_is_before`, `time_range` |\n\n### Filter syntax and operators\n\nSee [Search filters](https://docs.usepylon.com/pylon-docs/developer/api/conventions#search-filters) for filter structure and operator definitions. The table above lists the operators supported by each field.\n\n### Filter values\n\nTimestamp values use RFC 3339 format, such as `2026-10-01T00:00:00Z`.\n\n`status` accepts:\n\n`not_started`\n`in_progress`\n`completed`\n\n### Custom fields\n\nSet `field` to the custom field's slug.\n\n**Rate limit:** 120 requests per minute",
         "operationId": "SearchProjects",
         "requestBody": {
           "content": {
@@ -21842,7 +22932,7 @@
     },
     "/surveys/search": {
       "post": {
-        "description": "Filterable fields and their allowed operators:\n\n Field | Allowed operators |\n --- | --- |\n `updated_at` | `time_is_after`, `time_is_before`, `time_range` |\n\nTimestamp values use RFC3339 format.\n\n**Rate limit:** 120 requests per minute",
+        "description": "Filterable fields and their allowed operators:\n\n Field | Allowed operators |\n --- | --- |\n `updated_at` | `time_is_after`, `time_is_before`, `time_range` |\n\n### Filter syntax and operators\n\nSee [Search filters](https://docs.usepylon.com/pylon-docs/developer/api/conventions#search-filters) for filter structure and operator definitions. The table above lists the operators supported by each field.\n\n### Timestamp values\n\nTimestamp values use RFC 3339 format, such as `2026-10-01T00:00:00Z`.\n\n**Rate limit:** 120 requests per minute",
         "operationId": "SearchSurveys",
         "requestBody": {
           "content": {
@@ -22489,7 +23579,7 @@
     },
     "/tasks/search": {
       "post": {
-        "description": "Filterable fields and their allowed operators:\n\n Field | Allowed operators |\n --- | --- |\n `account_id` | `equals`, `in`, `not_in`, `is_set` |\n `project_id` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `status` | `equals`, `in`, `not_in` |\n `assignee_id` | `equals`, `in`, `not_in`, `is_set` |\n `milestone_id` | `equals`, `in`, `not_in`, `is_set` |\n `created_at` | `time_is_after`, `time_is_before`, `time_range` |\n `due_date` | `time_is_after`, `time_is_before`, `time_range`, `is_set` |\n `updated_at` | `time_is_after`, `time_is_before`, `time_range` |\n\nTimestamp values use RFC3339 format. Valid `status` values are `not_started`, `in_progress`, and `completed`. For custom fields, pass the field slug as `field`.\n\n**Rate limit:** 120 requests per minute",
+        "description": "Filterable fields and their allowed operators:\n\n Field | Allowed operators |\n --- | --- |\n `account_id` | `equals`, `in`, `not_in`, `is_set` |\n `project_id` | `equals`, `in`, `not_in`, `is_set`, `is_unset` |\n `status` | `equals`, `in`, `not_in` |\n `assignee_id` | `equals`, `in`, `not_in`, `is_set` |\n `milestone_id` | `equals`, `in`, `not_in`, `is_set` |\n `created_at` | `time_is_after`, `time_is_before`, `time_range` |\n `due_date` | `time_is_after`, `time_is_before`, `time_range`, `is_set` |\n `updated_at` | `time_is_after`, `time_is_before`, `time_range` |\n\n### Filter syntax and operators\n\nSee [Search filters](https://docs.usepylon.com/pylon-docs/developer/api/conventions#search-filters) for filter structure and operator definitions. The table above lists the operators supported by each field.\n\n### Filter values\n\nTimestamp values use RFC 3339 format, such as `2026-10-01T00:00:00Z`.\n\n`status` accepts:\n\n`not_started`\n`in_progress`\n`completed`\n\n### Custom fields\n\nSet `field` to the custom field's slug.\n\n**Rate limit:** 120 requests per minute",
         "operationId": "SearchTasks",
         "requestBody": {
           "content": {
@@ -23156,6 +24246,53 @@
       }
     },
     "/teams/{id}": {
+      "delete": {
+        "description": "Delete an existing team\nDeletes a team and its memberships and schedules. Subteams are detached and remain available.\nTeams referenced by other configuration or owning internal accounts cannot be deleted until those references are removed.\n\n**Rate limit:** 30 requests per minute",
+        "operationId": "DeleteTeam",
+        "parameters": [
+          {
+            "description": "The ID of the team to delete.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-go-name": "ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DeleteTeamResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestApiResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedApiResponse"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenApiResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/ErrorApiResponse"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequestsApiResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerErrorApiResponse"
+          }
+        },
+        "tags": [
+          "teams"
+        ],
+        "x-fern-request-name": "TeamsDeleteRequest",
+        "x-fern-sdk-group-name": [
+          "teams"
+        ],
+        "x-fern-sdk-method-name": "delete"
+      },
       "get": {
         "description": "Returns a single team by ID, with how it assigns issues and its recurring assignment\nschedule if it has one.\n\n**Rate limit:** 300 requests per minute",
         "operationId": "GetTeam",
@@ -23775,7 +24912,7 @@
     },
     "/user-roles": {
       "get": {
-        "description": "Returns all user roles for the organization.\n\n**Rate limit:** 300 requests per minute",
+        "description": "Returns all user roles for the organization, with the actions each role grants.\nPermission and issue access rule filters use the same filter shape that search endpoints accept;\na filter the API can't represent is omitted and marked filter_unsupported. A \"current_user\"\nvalue in a filter means the user the permission is checked for.\n\n**Rate limit:** 300 requests per minute",
         "operationId": "GetUserRoles",
         "responses": {
           "200": {
@@ -23895,9 +25032,58 @@
         "x-fern-sdk-method-name": "list"
       }
     },
+    "/users/invite": {
+      "post": {
+        "description": "Creates a user and emails them an invitation to join the organization. If a user with this email already exists,\nthey are reactivated if needed and sent a new invitation, and any pending invitation is canceled. Requires admin permissions.\n\n**Rate limit:** 30 requests per minute",
+        "operationId": "InviteUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteUserRequestBody"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "Body"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetUserResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestApiResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedApiResponse"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenApiResponse"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequestsApiResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerErrorApiResponse"
+          }
+        },
+        "summary": "Invite a user",
+        "tags": [
+          "users"
+        ],
+        "x-fern-request-name": "UsersInviteRequest",
+        "x-fern-retries": {
+          "disabled": true
+        },
+        "x-fern-sdk-group-name": [
+          "users"
+        ],
+        "x-fern-sdk-method-name": "invite"
+      }
+    },
     "/users/search": {
       "post": {
-        "description": "Filterable fields and their allowed operators:\n\n Field | Allowed operators |\n --- | --- |\n `email` | `equals`, `in`, `not_in` |\n\n**Rate limit:** 120 requests per minute",
+        "description": "Filterable fields and their allowed operators:\n\n Field | Allowed operators |\n --- | --- |\n `email` | `equals`, `in`, `not_in` |\n\n### Filter syntax and operators\n\nSee [Search filters](https://docs.usepylon.com/pylon-docs/developer/api/conventions#search-filters) for filter structure and operator definitions. The table above lists the operators supported by each field.\n\n**Rate limit:** 120 requests per minute",
         "operationId": "SearchUsers",
         "requestBody": {
           "content": {
