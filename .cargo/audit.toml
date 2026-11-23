@@ -1,0 +1,4 @@
+[advisories]
+# chrono is unmaintained with no patched release. It is a lock-closure-only
+# dependency (see Cargo.toml) required by the Fern-generated model crates.
+ignore = ["RUSTSEC-2026-0543"]
